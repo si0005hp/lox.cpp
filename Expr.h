@@ -125,11 +125,11 @@ class Grouping : public Expr
 class Literal : public Expr
 {
   public:
-    Literal(Object value) : mValue(value)
+    Literal(shared_ptr<Object> value) : mValue(value)
     {
     }
 
-    Object mValue;
+    shared_ptr<Object> mValue;
 
     ACCEPT_METHODS
 };

@@ -1,12 +1,17 @@
 #pragma once
 
 #include "Expr.h"
+#include <any>
 #include <functional>
 #include <string>
+#include <type_traits>
 
 namespace Cclox
 {
 
+using std::any;
+using std::any_cast;
+using std::bad_any_cast;
 using std::reference_wrapper;
 using std::string;
 using std::stringstream;
@@ -22,78 +27,138 @@ class AstPrinter : public Expr::Visitor<string>
 
     virtual string Visit(const Assign &expr) override
     {
-        return "";
+        return Parenthesize2("=", vector<any>{expr.mName->Lexeme(), expr.mValue});
     }
 
     virtual string Visit(const Binary &expr) override
     {
-        return "";
+        return Parenthesize(expr.mOp->Lexeme(), vector<shared_ptr<Expr>>{expr.mLeft, expr.mRight});
     }
 
     virtual string Visit(const Call &expr) override
     {
-        return "";
+        return Parenthesize2("call", vector<any>{expr.mCallee, expr.mArguments});
     }
 
     virtual string Visit(const Get &expr) override
     {
-        return "";
+        return Parenthesize2(".", vector<any>{expr.mObject, expr.mName->Lexeme()});
     }
 
     virtual string Visit(const Grouping &expr) override
     {
-        return "";
+        return Parenthesize("group", vector<shared_ptr<Expr>>{expr.mExpression});
     }
 
     virtual string Visit(const Literal &expr) override
     {
-        return expr.mValue.Str();
+        return expr.mValue->Str();
     }
 
     virtual string Visit(const Logical &expr) override
     {
-        return "";
+        return Parenthesize(expr.mOp->Lexeme(), vector<shared_ptr<Expr>>{expr.mLeft, expr.mRight});
     }
 
     virtual string Visit(const Set &expr) override
     {
-        return "";
+        return Parenthesize2("=", vector<any>{expr.mObject, expr.mName->Lexeme(), expr.mValue});
     }
 
     virtual string Visit(const Super &expr) override
     {
-        return "";
+        return Parenthesize2("super", vector<any>{expr.mMethod});
     }
 
     virtual string Visit(const This &expr) override
     {
-        return "";
+        return "this";
     }
 
     virtual string Visit(const Unary &expr) override
     {
-        return "";
+        return Parenthesize(expr.mOp->Lexeme(), vector<shared_ptr<Expr>>{expr.mRight});
     }
 
     virtual string Visit(const Variable &expr) override
     {
-        return "";
+        return expr.mName->Lexeme();
     }
 
-    //   private:
-    string Parenthesize(const string &name, vector<reference_wrapper<const Expr>> exprs)
+  private:
+    string Parenthesize(const string &name, const vector<shared_ptr<Expr>> &exprs)
     {
         stringstream ss;
 
         ss << "(" << name;
-        for (const Expr &expr : exprs)
+        for (auto expr : exprs)
         {
             ss << " ";
-            ss << expr.Accept(*this);
+            ss << expr->Accept(*this);
         }
         ss << ")";
 
         return ss.str();
+    }
+
+    string Parenthesize2(const string &name, const vector<any> &parts)
+    {
+        stringstream ss;
+
+        ss << "(" << name;
+        Transform(ss, parts);
+        ss << ")";
+
+        return ss.str();
+    }
+
+    void Transform(stringstream &ss, const vector<any> &parts)
+    {
+        for (auto part : parts)
+        {
+            ss << " ";
+            if (IsType<string>(part))
+            {
+                ss << any_cast<string>(part);
+            }
+            else if (IsType<shared_ptr<Expr>>(part))
+            {
+                ss << any_cast<shared_ptr<Expr>>(part)->Accept(*this);
+            }
+            else if (IsType<shared_ptr<Token>>(part))
+            {
+                ss << any_cast<shared_ptr<Token>>(part)->Lexeme();
+            }
+            else if (IsType<vector<shared_ptr<Expr>>>(part))
+            {
+                Transform(ss, ToAnyVector(any_cast<vector<shared_ptr<Expr>>>(part)));
+            }
+            else
+            {
+                ss << any_cast<string>(part); // treat as string
+            }
+        }
+    }
+
+    template <typename T> bool IsType(any a)
+    {
+        try
+        {
+            any_cast<T>(a);
+            return true;
+        }
+        catch (bad_any_cast &e)
+        {
+            return false;
+        }
+    }
+
+    template <typename T> vector<any> ToAnyVector(const vector<T> &src)
+    {
+        vector<any> dst;
+        for (auto e : src)
+            dst.push_back(e);
+        return dst;
     }
 };
 

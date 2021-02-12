@@ -13,7 +13,7 @@ const map<string, string> exprs = {
     {"Call", "shared_ptr<Expr> callee, shared_ptr<Token> paren, vector<shared_ptr<Expr>> arguments"},
     {"Get", "shared_ptr<Expr> object, shared_ptr<Token> name"},
     {"Grouping", "shared_ptr<Expr> expression"},
-    {"Literal", "Object value"},
+    {"Literal", "shared_ptr<Object> value"},
     {"Logical", "shared_ptr<Expr> left, shared_ptr<Token> op, shared_ptr<Expr> right"},
     {"Set", "shared_ptr<Expr> object, shared_ptr<Token> name, shared_ptr<Expr> value"},
     {"Super", "shared_ptr<Token> keyword, shared_ptr<Token> method"},
