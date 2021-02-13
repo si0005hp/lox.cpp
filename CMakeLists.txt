@@ -8,6 +8,7 @@ set(cclox_lib_SRC
   ${PROJECT_SOURCE_DIR}/Lox.cpp
   ${PROJECT_SOURCE_DIR}/Token.cpp
   ${PROJECT_SOURCE_DIR}/Scanner.cpp
+  ${PROJECT_SOURCE_DIR}/Parser.cpp
 )
 
 add_library(cclox_lib ${cclox_lib_SRC})

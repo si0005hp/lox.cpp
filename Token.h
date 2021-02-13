@@ -82,13 +82,9 @@ class Token
     {
         return mLexeme;
     }
-    double Number() const
+    const Object &Literal() const
     {
-        return mLiteral.Number();
-    }
-    const string &Text() const
-    {
-        return mLiteral.Text();
+        return mLiteral;
     }
     int Line() const
     {

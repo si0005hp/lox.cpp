@@ -2,17 +2,50 @@
 #include <iostream>
 #include <sstream>
 
-#include "Token.h"
+#include "AstPrinter.h"
+#include "Parser.h"
+#include "Scanner.h"
 
 using namespace Cclox;
 
+void PrintAst(const string &source)
+{
+    Scanner s(source);
+    Parser p(s.ScanTokens());
+    std::cout << AstPrinter().Print(*p.Parse()) << std::endl;
+}
+
+void RunRepl()
+{
+    bool isFirstLine = false;
+
+    while (true)
+    {
+        if (isFirstLine)
+        {
+            std::cout << ">> ";
+            isFirstLine = false;
+        }
+        else
+        {
+            std::cout << ".. ";
+        }
+
+        string line;
+        while (line.size() == 0)
+        {
+            std::getline(std::cin, line);
+        }
+        PrintAst(line);
+    }
+}
+
 int main(int argc, char const *argv[])
 {
-    // Token t(TokenType::ELSE, "aaa", "a", 0);
-    Token t(TokenType::TOKEN_NUMBER, "axx", 12, 0);
-    Token t2(TokenType::TOKEN_STRING, "asfsdg", "hello", 0);
+    std::cout << "cclox 0.0.0d" << std::endl;
+    std::cout << "------------" << std::endl;
 
-    std::cout << t << std::endl;
+    RunRepl();
 
     return 0;
 }

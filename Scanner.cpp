@@ -12,7 +12,7 @@ const unordered_map<string, TokenType> Scanner::sKeywords = {
     {"this", TOKEN_THIS}, {"true", TOKEN_TRUE},   {"var", TOKEN_VAR},       {"while", TOKEN_WHILE},
 };
 
-vector<shared_ptr<Token>> Scanner::ScanTokens()
+const vector<shared_ptr<Token>> &Scanner::ScanTokens()
 {
     while (!IsAtEnd())
     {
@@ -60,7 +60,7 @@ void Scanner::ScanToken()
         AddToken(TOKEN_STAR);
         break;
         /* two-char-tokens */
-    case '|':
+    case '!':
         AddToken(Match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         break;
     case '=':

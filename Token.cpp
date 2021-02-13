@@ -133,11 +133,11 @@ std::ostream &operator<<(std::ostream &cout, const Token &token)
 
     if (token.Type() == TOKEN_STRING)
     {
-        cout << token.Text();
+        cout << token.Literal().Text();
     }
     else if (token.Type() == TOKEN_NUMBER)
     {
-        cout << token.Number();
+        cout << token.Literal().Number();
     }
     else
     {

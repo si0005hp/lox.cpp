@@ -142,15 +142,7 @@ class AstPrinter : public Expr::Visitor<string>
 
     template <typename T> bool IsType(any a)
     {
-        try
-        {
-            any_cast<T>(a);
-            return true;
-        }
-        catch (bad_any_cast &e)
-        {
-            return false;
-        }
+        return a.type().name() == typeid(T).name();
     }
 
     template <typename T> vector<any> ToAnyVector(const vector<T> &src)

@@ -24,4 +24,5 @@ package_add_test(cclox_test
   Token_test.cpp
   Object_test.cpp
   AstPrinter_test.cpp
+  Parser_test.cpp
 )

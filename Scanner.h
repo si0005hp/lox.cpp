@@ -22,7 +22,7 @@ class Scanner
     {
     }
 
-    vector<shared_ptr<Token>> ScanTokens();
+    const vector<shared_ptr<Token>> &ScanTokens();
 
   private:
     static const unordered_map<string, TokenType> sKeywords;
