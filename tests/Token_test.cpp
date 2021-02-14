@@ -1,3 +1,4 @@
+#include "TestUtil.h"
 #include "Token.h"
 
 #include "gmock/gmock.h"
@@ -6,7 +7,7 @@
 using namespace Cclox;
 using namespace std;
 
-class TokenTestFixture : public ::testing::Test
+class TokenTestFixture : public CcloxTestFixtureBase
 {
   public:
     TokenTestFixture()

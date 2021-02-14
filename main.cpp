@@ -3,10 +3,13 @@
 #include <sstream>
 
 #include "AstPrinter.h"
+#include "Interpreter.h"
 #include "Parser.h"
 #include "Scanner.h"
 
 using namespace Cclox;
+
+static Interpreter interpreter;
 
 void PrintAst(const string &source)
 {
@@ -15,7 +18,17 @@ void PrintAst(const string &source)
     std::cout << AstPrinter().Print(*p.Parse()) << std::endl;
 }
 
-void RunRepl()
+void Interpret(const string &source)
+{
+    Scanner s(source);
+    Parser p(s.ScanTokens());
+
+    auto value = interpreter.Interpret(*p.Parse());
+    auto str = value ? value->Str() : "nil";
+    std::cout << str << std::endl;
+}
+
+void RunRepl(const bool &isDebug)
 {
     bool isFirstLine = false;
 
@@ -36,8 +49,17 @@ void RunRepl()
         {
             std::getline(std::cin, line);
         }
-        PrintAst(line);
+
+        if (isDebug)
+            PrintAst(line);
+        else
+            Interpret(line);
     }
+}
+
+bool IsAstDebug(int argc, char const *argv[])
+{
+    return argc > 1 && string(argv[1]) == "s";
 }
 
 int main(int argc, char const *argv[])
@@ -45,7 +67,7 @@ int main(int argc, char const *argv[])
     std::cout << "cclox 0.0.0d" << std::endl;
     std::cout << "------------" << std::endl;
 
-    RunRepl();
+    RunRepl(IsAstDebug(argc, argv));
 
     return 0;
 }

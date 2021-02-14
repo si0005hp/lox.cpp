@@ -39,6 +39,10 @@ class Object
     {
     }
 
+    ObjectType Type() const
+    {
+        return mType;
+    }
     double Number() const
     {
         return mNumber;

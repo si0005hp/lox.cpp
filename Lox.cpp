@@ -27,6 +27,13 @@ void Lox::Error(const Token &token, const string &message)
     }
 }
 
+void Lox::ErrorRuntimeError(const RuntimeError &error)
+{
+    std::cerr << error.mMsg << std::endl;
+    std::cerr << "[line " << error.mToken->Line() << "]" << std::endl;
+    sHadError = true;
+}
+
 void Lox::Report(const int &line, const string &where, const string &message)
 {
     std::cerr << "[line " << line << "]" << where << ":" << message << std::endl;

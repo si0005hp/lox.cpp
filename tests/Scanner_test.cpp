@@ -1,5 +1,6 @@
 
 #include "Scanner.h"
+#include "TestUtil.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -8,7 +9,7 @@ using namespace Cclox;
 using namespace std;
 using testing::AllOfArray;
 
-class ScannerTestFixture : public ::testing::Test
+class ScannerTestFixture : public CcloxTestFixtureBase
 {
   public:
     ScannerTestFixture()

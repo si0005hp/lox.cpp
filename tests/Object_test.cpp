@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "TestUtil.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -6,7 +7,7 @@
 using namespace Cclox;
 using namespace std;
 
-class ObjectTestFixture : public ::testing::Test
+class ObjectTestFixture : public CcloxTestFixtureBase
 {
   public:
     ObjectTestFixture()

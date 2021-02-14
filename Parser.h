@@ -61,7 +61,7 @@ class Parser
     shared_ptr<Token> Consume(const TokenType &type, const string &message);
     ParseError Error(const Token &token, const string &message);
 
-    const vector<shared_ptr<Token>> &mTokens;
+    const vector<shared_ptr<Token>> mTokens;
     int mCurrent = 0;
 };
 

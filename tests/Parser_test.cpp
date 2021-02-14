@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include "Scanner.h"
+#include "TestUtil.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -7,12 +8,9 @@
 using namespace Cclox;
 using namespace std;
 
-class ParserTestFixture : public ::testing::Test
+class ParserTestFixture : public CcloxTestFixtureBase
 {
   public:
-    shared_ptr<Scanner> s;
-    shared_ptr<Parser> p;
-
     ParserTestFixture()
     {
     }
@@ -22,22 +20,11 @@ class ParserTestFixture : public ::testing::Test
     void TearDown()
     {
     }
-    void SetupParser(const string &source)
-    {
-        s = make_shared<Scanner>(source);
-        p = make_shared<Parser>(s->ScanTokens());
-    }
 };
-
-template <typename T> T As(shared_ptr<Expr> expr)
-{
-    shared_ptr<T> tp = static_pointer_cast<T>(expr);
-    return *tp;
-}
 
 TEST_F(ParserTestFixture, Primary)
 {
-    SetupParser("12 3.4 \"foobar\" true false nil");
+    auto p = GenerateParserFromSource("12 3.4 \"foobar\" true false nil");
 
     auto literal = As<Literal>(p->ParsePrimary());
     ASSERT_EQ(12, literal.mValue->Number());
@@ -60,7 +47,7 @@ TEST_F(ParserTestFixture, Primary)
 
 TEST_F(ParserTestFixture, Unary)
 {
-    SetupParser("-3 !false --4.8");
+    auto p = GenerateParserFromSource("-3 !false --4.8");
 
     auto unary = As<Unary>(p->ParseUnary());
     ASSERT_EQ("-", unary.mOp->Lexeme());
@@ -79,7 +66,7 @@ TEST_F(ParserTestFixture, Unary)
 
 TEST_F(ParserTestFixture, Factor)
 {
-    SetupParser("3*5 14/-7*6");
+    auto p = GenerateParserFromSource("3*5 14/-7*6");
 
     // 3*5
     auto factor = As<Binary>(p->ParseFactor());
@@ -103,7 +90,7 @@ TEST_F(ParserTestFixture, Factor)
 
 TEST_F(ParserTestFixture, Term)
 {
-    SetupParser("2*3+14/7");
+    auto p = GenerateParserFromSource("2*3+14/7");
 
     auto term = As<Binary>(p->ParseTerm());
     auto lFactor = As<Binary>(term.mLeft);
@@ -119,7 +106,7 @@ TEST_F(ParserTestFixture, Term)
 
 TEST_F(ParserTestFixture, Comparison)
 {
-    SetupParser("4>7 3<=5 1+2<8");
+    auto p = GenerateParserFromSource("4>7 3<=5 1+2<8");
 
     auto comp = As<Binary>(p->ParseComparison());
     ASSERT_EQ(4, As<Literal>(comp.mLeft).mValue->Number());
@@ -142,7 +129,7 @@ TEST_F(ParserTestFixture, Comparison)
 
 TEST_F(ParserTestFixture, Equality)
 {
-    SetupParser("8==2 2>3!=6+11*4");
+    auto p = GenerateParserFromSource("8==2 2>3!=6+11*4");
 
     auto eq = As<Binary>(p->ParseEquality());
     ASSERT_EQ(8, As<Literal>(eq.mLeft).mValue->Number());

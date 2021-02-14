@@ -2,13 +2,20 @@
 
 #include "Object.h"
 #include "Token.h"
+#include "Value.h"
 #include <memory>
 #include <vector>
 
-#define V_ACCEPT_METHODS virtual string Accept(Visitor<string> &visitor) const = 0;
+#define V_ACCEPT_METHODS                                                                                               \
+    virtual string Accept(Visitor<string> &visitor) const = 0;                                                         \
+    virtual shared_ptr<Value> Accept(Visitor<shared_ptr<Value>> &visitor) const = 0;
 
 #define ACCEPT_METHODS                                                                                                 \
     string Accept(Visitor<string> &visitor) const override                                                             \
+    {                                                                                                                  \
+        return visitor.Visit(*this);                                                                                   \
+    }                                                                                                                  \
+    shared_ptr<Value> Accept(Visitor<shared_ptr<Value>> &visitor) const override                                       \
     {                                                                                                                  \
         return visitor.Visit(*this);                                                                                   \
     }
