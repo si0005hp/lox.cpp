@@ -7,7 +7,7 @@
 
 using namespace std;
 
-const map<string, string> exprs = {
+const static map<string, string> exprs = {
     {"Assign", "shared_ptr<Token> name, shared_ptr<Expr> value"},
     {"Binary", "shared_ptr<Expr> left, shared_ptr<Token> op, shared_ptr<Expr> right"},
     {"Call", "shared_ptr<Expr> callee, shared_ptr<Token> paren, vector<shared_ptr<Expr>> arguments"},
@@ -52,16 +52,24 @@ string toMember(string str)
     return "m" + str;
 }
 
-string defineVisitor()
+string toLower(const string &str)
+{
+    string copy = str;
+    transform(copy.begin(), copy.end(), copy.begin(), ::tolower);
+    return copy;
+}
+
+string defineVisitor(const string &baseName, const map<string, string> &types)
 {
     stringstream ss;
 
     ss << "template <class R> class Visitor";
     ss << " { ";
     ss << " public: ";
-    for (auto &[className, fieldsAsStr] : exprs)
+    for (auto &[className, fieldsAsStr] : types)
     {
-        ss << "virtual R Visit(const " << className << " &expr) = 0;";
+        ss << "virtual R Visit(const " << className << " "
+           << "&" + toLower(baseName) << ") = 0;";
     }
     ss << " }; ";
     ss << endl << endl;
@@ -69,31 +77,31 @@ string defineVisitor()
     return ss.str();
 }
 
-void defineAst()
+void defineAst(const string &baseName, const map<string, string> &types)
 {
     stringstream ss;
 
-    for (auto &[className, fieldsAsStr] : exprs)
+    for (auto &[className, fieldsAsStr] : types)
     {
         ss << "class " << className << ";";
     }
     ss << endl << endl;
 
-    /* base expr */
-    ss << "class Expr";
+    /* base class */
+    ss << "class " << baseName;
     ss << " { ";
     ss << " public: ";
-    ss << defineVisitor();
+    ss << defineVisitor(baseName, types);
     ss << "V_ACCEPT_METHODS" << endl;
     ss << " }; ";
     ss << endl << endl;
 
-    /* sub exprs */
-    for (auto &[className, fieldsAsStr] : exprs)
+    /* sub classes */
+    for (auto &[className, fieldsAsStr] : types)
     {
         auto fields = split(fieldsAsStr, ',');
 
-        ss << "class " << className << " : public Expr ";
+        ss << "class " << className << " : public " << baseName;
         ss << " { ";
         ss << "public: " << endl;
 
@@ -141,23 +149,8 @@ void defineAst()
     cout << ss.str() << endl;
 }
 
-void defineMacro()
-{
-    cout << "#define V_ACCEPT_METHODS virtual string Accept(Visitor<string> &visitor) const = 0;" << endl;
-    cout << endl;
-
-    cout << "#define ACCEPT_METHODS \\" << endl;
-    cout << "  string Accept(Visitor<string> &visitor) const override \\" << endl;
-    cout << " { \\" << endl;
-    cout << "    return visitor.Visit(*this); \\" << endl;
-    cout << " } " << endl;
-    cout << endl << endl;
-}
-
 int main(int argc, char const *argv[])
 {
-    defineMacro();
-
     cout << "namespace Cclox";
     cout << " { ";
     cout << endl << endl;
@@ -165,7 +158,7 @@ int main(int argc, char const *argv[])
     cout << "using std::vector;";
     cout << endl << endl;
 
-    defineAst();
+    defineAst("Expr", exprs);
 
     cout << " };";
 
