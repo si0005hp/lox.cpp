@@ -22,6 +22,16 @@ const static map<string, string> exprs = {
     {"Variable", "shared_ptr<Token> name"},
 };
 
+const static map<string, string> stmts = {
+    {"Expression", "shared_ptr<Expr> expression"},
+    {"Print", "shared_ptr<Expr> expression"},
+    {"Var", "shared_ptr<Token> name, shared_ptr<Expr> initializer"},
+};
+
+const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>"};
+
+const static vector<string> stmtVisitorTypes = {"string", "void"};
+
 vector<string> split(string str, char del)
 {
     vector<string> result;
@@ -59,6 +69,13 @@ string toLower(const string &str)
     return copy;
 }
 
+string toUpper(const string &str)
+{
+    string copy = str;
+    transform(copy.begin(), copy.end(), copy.begin(), ::toupper);
+    return copy;
+}
+
 string defineVisitor(const string &baseName, const map<string, string> &types)
 {
     stringstream ss;
@@ -92,7 +109,7 @@ void defineAst(const string &baseName, const map<string, string> &types)
     ss << " { ";
     ss << " public: ";
     ss << defineVisitor(baseName, types);
-    ss << "V_ACCEPT_METHODS" << endl;
+    ss << "V_" << toUpper(baseName) << "_ACCEPT_METHODS" << endl;
     ss << " }; ";
     ss << endl << endl;
 
@@ -140,7 +157,7 @@ void defineAst(const string &baseName, const map<string, string> &types)
 
         // accept for visitor
         ss << endl;
-        ss << "ACCEPT_METHODS";
+        ss << toUpper(baseName) << "_ACCEPT_METHODS";
 
         ss << " };";
         ss << endl << endl;
@@ -149,8 +166,41 @@ void defineAst(const string &baseName, const map<string, string> &types)
     cout << ss.str() << endl;
 }
 
+void defineMacro(const string &baseName, const vector<string> &visitorTypes)
+{
+    // base
+    cout << "#define V_" << toUpper(baseName) << "_ACCEPT_METHODS \\" << endl;
+    for (int i = 0; i < visitorTypes.size(); i++)
+    {
+        if (i != 0)
+            cout << " \\" << endl;
+        cout << " virtual " << visitorTypes[i] << " Accept(Visitor<" << visitorTypes[i] << "> &visitor) const = 0; ";
+    }
+    cout << endl << endl;
+    // sub
+    cout << "#define " << toUpper(baseName) << "_ACCEPT_METHODS \\" << endl;
+    for (int i = 0; i < visitorTypes.size(); i++)
+    {
+        if (i != 0)
+            cout << " \\" << endl;
+        cout << visitorTypes[i] << " Accept(Visitor<" << visitorTypes[i]
+             << "> &visitor) const override { return visitor.Visit(*this); }";
+    }
+    cout << endl << endl;
+}
+
+bool IsStmt(int argc, char const *argv[])
+{
+    return argc > 1 && string(argv[1]) == "stmt";
+}
+
 int main(int argc, char const *argv[])
 {
+    if (IsStmt(argc, argv))
+        defineMacro("Stmt", stmtVisitorTypes);
+    else
+        defineMacro("Expr", exprVisitorTypes);
+
     cout << "namespace Cclox";
     cout << " { ";
     cout << endl << endl;
@@ -158,7 +208,10 @@ int main(int argc, char const *argv[])
     cout << "using std::vector;";
     cout << endl << endl;
 
-    defineAst("Expr", exprs);
+    if (IsStmt(argc, argv))
+        defineAst("Stmt", stmts);
+    else
+        defineAst("Expr", exprs);
 
     cout << " };";
 

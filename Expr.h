@@ -6,11 +6,11 @@
 #include <memory>
 #include <vector>
 
-#define V_ACCEPT_METHODS                                                                                               \
+#define V_EXPR_ACCEPT_METHODS                                                                                          \
     virtual string Accept(Visitor<string> &visitor) const = 0;                                                         \
     virtual shared_ptr<Value> Accept(Visitor<shared_ptr<Value>> &visitor) const = 0;
 
-#define ACCEPT_METHODS                                                                                                 \
+#define EXPR_ACCEPT_METHODS                                                                                            \
     string Accept(Visitor<string> &visitor) const override                                                             \
     {                                                                                                                  \
         return visitor.Visit(*this);                                                                                   \
@@ -59,7 +59,7 @@ class Expr
         virtual R Visit(const Variable &expr) = 0;
     };
 
-    V_ACCEPT_METHODS
+    V_EXPR_ACCEPT_METHODS
 };
 
 class Assign : public Expr
@@ -72,7 +72,7 @@ class Assign : public Expr
     shared_ptr<Token> mName;
     shared_ptr<Expr> mValue;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Binary : public Expr
@@ -86,7 +86,7 @@ class Binary : public Expr
     shared_ptr<Token> mOp;
     shared_ptr<Expr> mRight;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Call : public Expr
@@ -101,7 +101,7 @@ class Call : public Expr
     shared_ptr<Token> mParen;
     vector<shared_ptr<Expr>> mArguments;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Get : public Expr
@@ -114,7 +114,7 @@ class Get : public Expr
     shared_ptr<Expr> mObject;
     shared_ptr<Token> mName;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Grouping : public Expr
@@ -126,7 +126,7 @@ class Grouping : public Expr
 
     shared_ptr<Expr> mExpression;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Literal : public Expr
@@ -138,7 +138,7 @@ class Literal : public Expr
 
     shared_ptr<Object> mValue;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Logical : public Expr
@@ -152,7 +152,7 @@ class Logical : public Expr
     shared_ptr<Token> mOp;
     shared_ptr<Expr> mRight;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Set : public Expr
@@ -167,7 +167,7 @@ class Set : public Expr
     shared_ptr<Token> mName;
     shared_ptr<Expr> mValue;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Super : public Expr
@@ -180,7 +180,7 @@ class Super : public Expr
     shared_ptr<Token> mKeyword;
     shared_ptr<Token> mMethod;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class This : public Expr
@@ -192,7 +192,7 @@ class This : public Expr
 
     shared_ptr<Token> mKeyword;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Unary : public Expr
@@ -205,7 +205,7 @@ class Unary : public Expr
     shared_ptr<Token> mOp;
     shared_ptr<Expr> mRight;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 class Variable : public Expr
@@ -217,7 +217,7 @@ class Variable : public Expr
 
     shared_ptr<Token> mName;
 
-    ACCEPT_METHODS
+    EXPR_ACCEPT_METHODS
 };
 
 }; // namespace Cclox

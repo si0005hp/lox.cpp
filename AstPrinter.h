@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Expr.h"
+#include "Stmt.h"
 #include <any>
 #include <functional>
 #include <string>
@@ -17,12 +18,31 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
-class AstPrinter : public Expr::Visitor<string>
+class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
 {
   public:
-    string Print(const Expr &expr)
+    string Ast(const Expr &expr)
     {
         return expr.Accept(*this);
+    }
+    string Ast(const Stmt &stmt)
+    {
+        return stmt.Accept(*this);
+    }
+
+    virtual string Visit(const Expression &stmt) override
+    {
+        return Parenthesize(";", vector<shared_ptr<Expr>>{stmt.mExpression});
+    }
+    virtual string Visit(const Print &stmt) override
+    {
+        return Parenthesize("print", vector<shared_ptr<Expr>>{stmt.mExpression});
+    }
+    virtual string Visit(const Var &stmt) override
+    {
+        if (stmt.mInitializer)
+            return Parenthesize2("var", vector<any>{stmt.mName, "=", stmt.mInitializer});
+        return Parenthesize2("var", vector<any>{stmt.mName});
     }
 
     virtual string Visit(const Assign &expr) override

@@ -23,7 +23,7 @@ class AstPrinterTestFixture : public CcloxTestFixtureBase
     }
 };
 
-TEST_F(AstPrinterTestFixture, base)
+TEST_F(AstPrinterTestFixture, expr_base)
 {
     // Literal
     ASSERT_EQ("foo", p.Visit(Literal(make_shared<Object>("foo"))));
@@ -50,6 +50,15 @@ TEST_F(AstPrinterTestFixture, base)
                                make_shared<Literal>(make_shared<Object>(10)),
                                make_shared<Literal>(make_shared<Object>("sval")),
                            })));
+}
+
+TEST_F(AstPrinterTestFixture, stmt_base)
+{
+    // Expression
+    ASSERT_EQ("(; 10)", p.Visit(Expression(make_shared<Literal>(make_shared<Object>(10)))));
+
+    // Print
+    ASSERT_EQ("(print aaa)", p.Visit(Print(make_shared<Literal>(make_shared<Object>("aaa")))));
 }
 
 TEST_F(AstPrinterTestFixture, compound1)

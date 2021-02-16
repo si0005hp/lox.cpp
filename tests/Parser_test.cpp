@@ -24,7 +24,7 @@ class ParserTestFixture : public CcloxTestFixtureBase
 
 TEST_F(ParserTestFixture, Primary)
 {
-    auto p = GenerateParserFromSource("12 3.4 \"foobar\" true false nil");
+    auto p = GenerateParserFromSource("12 3.4 \"foobar\" true false nil myvar");
 
     auto literal = As<Literal>(p->ParsePrimary());
     ASSERT_EQ(12, literal.mValue->Number());
@@ -43,6 +43,9 @@ TEST_F(ParserTestFixture, Primary)
 
     literal = As<Literal>(p->ParsePrimary());
     ASSERT_EQ(true, literal.mValue->IsNil());
+
+    auto var = As<Variable>(p->ParsePrimary());
+    ASSERT_EQ("myvar", var.mName->Lexeme());
 }
 
 TEST_F(ParserTestFixture, Unary)
@@ -143,4 +146,43 @@ TEST_F(ParserTestFixture, Equality)
     auto rightAsTerm = As<Binary>(eq.mRight);
     ASSERT_EQ("+", rightAsTerm.mOp->Lexeme());
     ASSERT_EQ("*", As<Binary>(rightAsTerm.mRight).mOp->Lexeme());
+}
+
+TEST_F(ParserTestFixture, Print)
+{
+    auto p = GenerateParserFromSource("print 999; print \"Hello\";");
+
+    auto print = As<Print>(p->ParseStatement());
+    ASSERT_EQ(999, As<Literal>(print.mExpression).mValue->Number());
+
+    print = As<Print>(p->ParseStatement());
+    ASSERT_EQ("Hello", As<Literal>(print.mExpression).mValue->Text());
+}
+
+TEST_F(ParserTestFixture, Expression)
+{
+    auto p = GenerateParserFromSource("999; \"Hello\";");
+
+    auto expression = As<Expression>(p->ParseStatement());
+    ASSERT_EQ(999, As<Literal>(expression.mExpression).mValue->Number());
+
+    expression = As<Expression>(p->ParseStatement());
+    ASSERT_EQ("Hello", As<Literal>(expression.mExpression).mValue->Text());
+}
+
+TEST_F(ParserTestFixture, VarDeclaration)
+{
+    auto p = GenerateParserFromSource("var foo; var i = 10; var s = \"hoge\";");
+
+    auto var = As<Var>(p->ParseDeclaration());
+    ASSERT_EQ("foo", var.mName->Lexeme());
+    ASSERT_FALSE(var.mInitializer);
+
+    var = As<Var>(p->ParseDeclaration());
+    ASSERT_EQ("i", var.mName->Lexeme());
+    ASSERT_EQ(10, As<Literal>(var.mInitializer).mValue->Number());
+
+    var = As<Var>(p->ParseDeclaration());
+    ASSERT_EQ("s", var.mName->Lexeme());
+    ASSERT_EQ("hoge", As<Literal>(var.mInitializer).mValue->Text());
 }

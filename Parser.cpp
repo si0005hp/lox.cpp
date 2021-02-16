@@ -9,7 +9,71 @@ using std::vector;
 // Syntax Grammar
 // http://www.craftinginterpreters.com/appendix-i.html
 
-shared_ptr<Expr> Parser::Parse()
+vector<shared_ptr<Stmt>> Parser::Parse()
+{
+    vector<shared_ptr<Stmt>> stmts;
+    while (!IsAtEnd())
+        stmts.push_back(ParseStatement());
+    return stmts;
+}
+
+// declaration    → classDecl
+//                | funDecl
+//                | varDecl
+//                | statement ;
+shared_ptr<Stmt> Parser::ParseDeclaration()
+{
+    try
+    {
+        if (Match(TOKEN_VAR))
+            return ParseVarDeclaration();
+        return ParseStatement();
+    }
+    catch (const ParseError &error)
+    {
+        Synchronize();
+        return nullptr;
+    }
+}
+
+// varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+shared_ptr<Stmt> Parser::ParseVarDeclaration()
+{
+    auto name = Consume(TOKEN_IDENTIFIER, "Expect variable name.");
+
+    auto initializer = Match(TOKEN_EQUAL) ? ParseExpression() : nullptr;
+
+    Consume(TOKEN_SEMICOLON, "Expect ';' after declaration.");
+    return make_shared<Var>(name, initializer);
+}
+
+// statement      → exprStmt
+//                | printStmt;
+shared_ptr<Stmt> Parser::ParseStatement()
+{
+    if (Match(TOKEN_PRINT))
+        return ParsePrintStatement();
+    return ParseExpressionStatement();
+}
+
+// printStmt      → "print" expression ";" ;
+shared_ptr<Stmt> Parser::ParsePrintStatement()
+{
+    shared_ptr<Expr> value = ParseExpression();
+    Consume(TOKEN_SEMICOLON, "Expect ';' after value.");
+    return make_shared<Print>(value);
+}
+
+// exprStmt       → expression ";" ;
+shared_ptr<Stmt> Parser::ParseExpressionStatement()
+{
+    shared_ptr<Expr> value = ParseExpression();
+    Consume(TOKEN_SEMICOLON, "Expect ';' after value.");
+    return make_shared<Expression>(value);
+}
+
+// TODO: delete as it's temporal
+shared_ptr<Expr> Parser::ParseExpr()
 {
     try
     {
@@ -96,8 +160,9 @@ shared_ptr<Expr> Parser::ParseUnary()
     return ParsePrimary();
 }
 
-// primary        → NUMBER | STRING | "true" | "false" | "nil"
-//                | "(" expression ")" ;
+// primary        → "true" | "false" | "nil" | "this"
+//                | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+//                | "super" "." IDENTIFIER ;
 shared_ptr<Expr> Parser::ParsePrimary()
 {
     if (Match(TOKEN_FALSE))
@@ -109,6 +174,9 @@ shared_ptr<Expr> Parser::ParsePrimary()
 
     if (Match(vector<TokenType>{TOKEN_NUMBER, TOKEN_STRING}))
         return make_shared<Literal>(make_shared<Object>(Previous()->Literal()));
+
+    if (Match(TOKEN_IDENTIFIER))
+        return make_shared<Variable>(Previous());
 
     if (Match(TOKEN_LEFT_PAREN))
     {
@@ -183,6 +251,33 @@ ParseError Parser::Error(const Token &token, const string &message)
 {
     Lox::Error(token, message);
     return ParseError();
+}
+
+void Parser::Synchronize()
+{
+    Advance();
+    while (!IsAtEnd())
+    {
+        if (Previous()->Type() == TOKEN_SEMICOLON)
+            return;
+
+        switch (Peek()->Type())
+        {
+        case TOKEN_CLASS:
+        case TOKEN_FUN:
+        case TOKEN_VAR:
+        case TOKEN_FOR:
+        case TOKEN_IF:
+        case TOKEN_WHILE:
+        case TOKEN_PRINT:
+        case TOKEN_RETURN:
+            return;
+        default:
+            break;
+        }
+
+        Advance();
+    }
 }
 
 } // namespace Cclox

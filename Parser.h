@@ -5,6 +5,7 @@
 
 #include "Expr.h"
 #include "Lox.h"
+#include "Stmt.h"
 #include "Token.h"
 
 namespace Cclox
@@ -38,9 +39,18 @@ class Parser
     Parser(const vector<shared_ptr<Token>> &tokens) : mTokens(tokens)
     {
     }
-    shared_ptr<Expr> Parse();
+    vector<shared_ptr<Stmt>> Parse();
+    // TODO: delete as it's temporal
+    shared_ptr<Expr> ParseExpr();
 
     /* public scope for test */
+    shared_ptr<Stmt> ParseDeclaration();
+    shared_ptr<Stmt> ParseVarDeclaration();
+
+    shared_ptr<Stmt> ParseStatement();
+    shared_ptr<Stmt> ParsePrintStatement();
+    shared_ptr<Stmt> ParseExpressionStatement();
+
     shared_ptr<Expr> ParseExpression();
     shared_ptr<Expr> ParseEquality();
     shared_ptr<Expr> ParseComparison();
@@ -60,6 +70,7 @@ class Parser
     shared_ptr<Token> Previous();
     shared_ptr<Token> Consume(const TokenType &type, const string &message);
     ParseError Error(const Token &token, const string &message);
+    void Synchronize();
 
     const vector<shared_ptr<Token>> mTokens;
     int mCurrent = 0;

@@ -15,7 +15,17 @@ void PrintAst(const string &source)
 {
     Scanner s(source);
     Parser p(s.ScanTokens());
-    std::cout << AstPrinter().Print(*p.Parse()) << std::endl;
+    std::cout << AstPrinter().Ast(*p.ParseExpr()) << std::endl;
+}
+
+void InterpretExpr(const string &source)
+{
+    Scanner s(source);
+    Parser p(s.ScanTokens());
+
+    auto value = interpreter.InterpretExpr(*p.ParseExpr());
+    auto str = value ? value->Str() : "nil";
+    std::cout << str << std::endl;
 }
 
 void Interpret(const string &source)
@@ -23,9 +33,7 @@ void Interpret(const string &source)
     Scanner s(source);
     Parser p(s.ScanTokens());
 
-    auto value = interpreter.Interpret(*p.Parse());
-    auto str = value ? value->Str() : "nil";
-    std::cout << str << std::endl;
+    interpreter.Interpret(p.Parse());
 }
 
 void RunRepl(const bool &isDebug)
@@ -53,6 +61,7 @@ void RunRepl(const bool &isDebug)
         if (isDebug)
             PrintAst(line);
         else
+            // InterpretExpr(line);
             Interpret(line);
     }
 }

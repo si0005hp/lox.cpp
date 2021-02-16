@@ -11,7 +11,21 @@ template <typename T, typename V> shared_ptr<Value> LoxValue(const V &value)
     return make_shared<T>(value);
 }
 
-shared_ptr<Value> Interpreter::Interpret(const Expr &expr)
+void Interpreter::Interpret(const vector<shared_ptr<Stmt>> &stmts)
+{
+    try
+    {
+        for (auto &stmt : stmts)
+            Execute(*stmt);
+    }
+    catch (const RuntimeError &e)
+    {
+        Lox::ErrorRuntimeError(e);
+    }
+}
+
+// TODO: delete as it's temporal
+shared_ptr<Value> Interpreter::InterpretExpr(const Expr &expr)
 {
     shared_ptr<Value> value;
     try
@@ -23,6 +37,26 @@ shared_ptr<Value> Interpreter::Interpret(const Expr &expr)
         Lox::ErrorRuntimeError(e);
     }
     return value;
+}
+
+void Interpreter::Execute(const Stmt &stmt)
+{
+    stmt.Accept(*this);
+}
+
+void Interpreter::Visit(const Expression &stmt)
+{
+    Evaluate(*stmt.mExpression);
+}
+
+void Interpreter::Visit(const Print &stmt)
+{
+    auto value = Evaluate(*stmt.mExpression);
+    Println(value->Str());
+}
+
+void Interpreter::Visit(const Var &stmt)
+{
 }
 
 shared_ptr<Value> Interpreter::Visit(const Assign &expr)
@@ -202,6 +236,11 @@ shared_ptr<Value> Interpreter::InterpretObject(const Object &object)
 shared_ptr<Value> Interpreter::InterpretObject(const shared_ptr<Object> &object)
 {
     return InterpretObject(*object);
+}
+
+void Interpreter::Println(const string &str)
+{
+    std::cout << str << std::endl;
 }
 
 }; // namespace Cclox

@@ -21,31 +21,6 @@ class InterpreterTestFixture : public CcloxTestFixtureBase
     void TearDown()
     {
     }
-
-    template <typename T> T NextPrimaryAs(shared_ptr<Parser> &p)
-    {
-        return As<T>(p->ParsePrimary());
-    }
-    Unary NextUnary(shared_ptr<Parser> &p)
-    {
-        return As<Unary>(p->ParseUnary());
-    }
-    Binary NextFactor(shared_ptr<Parser> &p)
-    {
-        return As<Binary>(p->ParseFactor());
-    }
-    Binary NextTerm(shared_ptr<Parser> &p)
-    {
-        return As<Binary>(p->ParseTerm());
-    }
-    Binary NextComparison(shared_ptr<Parser> &p)
-    {
-        return As<Binary>(p->ParseComparison());
-    }
-    Binary NextEquality(shared_ptr<Parser> &p)
-    {
-        return As<Binary>(p->ParseEquality());
-    }
 };
 
 TEST_F(InterpreterTestFixture, Literal)

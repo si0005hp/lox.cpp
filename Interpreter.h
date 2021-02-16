@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Expr.h"
+#include "Stmt.h"
 #include "Value.h"
 #include <memory>
 
@@ -25,10 +26,17 @@ class RuntimeError : public exception
     const string mMsg;
 };
 
-class Interpreter : public Expr::Visitor<shared_ptr<Value>>
+class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visitor<void>
 {
   public:
-    shared_ptr<Value> Interpret(const Expr &expr);
+    void Interpret(const vector<shared_ptr<Stmt>> &stmts);
+    // TODO: delete as it's temporal
+    shared_ptr<Value> InterpretExpr(const Expr &expr);
+
+    void Execute(const Stmt &stmt);
+    void Visit(const Expression &stmt);
+    void Visit(const Print &stmt);
+    void Visit(const Var &stmt);
 
     shared_ptr<Value> Visit(const Assign &expr);
     shared_ptr<Value> Visit(const Binary &expr);
@@ -52,6 +60,7 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>
 
     shared_ptr<Value> InterpretObject(const shared_ptr<Object> &object);
     shared_ptr<Value> InterpretObject(const Object &object);
+    void Println(const string &str);
 };
 
 }; // namespace Cclox
