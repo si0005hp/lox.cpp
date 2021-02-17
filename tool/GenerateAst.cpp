@@ -26,6 +26,7 @@ const static map<string, string> stmts = {
     {"Expression", "shared_ptr<Expr> expression"},
     {"Print", "shared_ptr<Expr> expression"},
     {"Var", "shared_ptr<Token> name, shared_ptr<Expr> initializer"},
+    {"Block", "vector<shared_ptr<Stmt>> statements"},
 };
 
 const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>"};

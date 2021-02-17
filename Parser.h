@@ -40,8 +40,6 @@ class Parser
     {
     }
     vector<shared_ptr<Stmt>> Parse();
-    // TODO: delete as it's temporal
-    shared_ptr<Expr> ParseExpr();
 
     /* public scope for test */
     shared_ptr<Stmt> ParseDeclaration();
@@ -50,8 +48,10 @@ class Parser
     shared_ptr<Stmt> ParseStatement();
     shared_ptr<Stmt> ParsePrintStatement();
     shared_ptr<Stmt> ParseExpressionStatement();
+    shared_ptr<Stmt> ParseBlock();
 
     shared_ptr<Expr> ParseExpression();
+    shared_ptr<Expr> ParseAssignment();
     shared_ptr<Expr> ParseEquality();
     shared_ptr<Expr> ParseComparison();
     shared_ptr<Expr> ParseTerm();

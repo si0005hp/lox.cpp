@@ -10,9 +10,11 @@ using namespace std;
 class InterpreterTestFixture : public CcloxTestFixtureBase
 {
   public:
+    std::ostringstream testOs;
     Interpreter i;
+    const Environment &iEnv;
 
-    InterpreterTestFixture()
+    InterpreterTestFixture() : i(Interpreter(testOs)), iEnv(i.GetEnvironment())
     {
     }
     void SetUp()
@@ -72,4 +74,44 @@ TEST_F(InterpreterTestFixture, Binary)
 
     /* some compound case */
     ASSERT_EQ(2, i.Visit(NextTerm(p))->AsNumber());
+}
+
+TEST_F(InterpreterTestFixture, Print)
+{
+    auto p = GenerateParserFromSource("print 1; print \"jack\"; print true; print nil;");
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ("1\njack\ntrue\nnil\n", testOs.str());
+}
+
+TEST_F(InterpreterTestFixture, Var)
+{
+    auto p = GenerateParserFromSource("var a; var b = 10; var s = \"hi\";");
+    i.Interpret(p->Parse());
+
+    ASSERT_FALSE(iEnv.Get(token("a")));
+    ASSERT_EQ(10, iEnv.Get(token("b"))->AsNumber());
+    ASSERT_EQ("hi", iEnv.Get(token("s"))->AsString());
+}
+
+TEST_F(InterpreterTestFixture, Assign)
+{
+    auto p = GenerateParserFromSource("var a; var b; var c; a = 2; b = c = 3;");
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ(2, iEnv.Get(token("a"))->AsNumber());
+    ASSERT_EQ(3, iEnv.Get(token("b"))->AsNumber());
+    ASSERT_EQ(3, iEnv.Get(token("c"))->AsNumber());
+}
+
+TEST_F(InterpreterTestFixture, Block)
+{
+    stringstream ss;
+    ss << "var a = 1; var b = 2; print a; print b; ";
+    ss << "{ var a = 9; print a; print b; } ";
+    ss << "print a; print b; ";
+    auto p = GenerateParserFromSource(ss.str());
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ("1\n2\n9\n2\n1\n2\n", testOs.str());
 }

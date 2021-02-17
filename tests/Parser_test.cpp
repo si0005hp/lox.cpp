@@ -148,6 +148,24 @@ TEST_F(ParserTestFixture, Equality)
     ASSERT_EQ("*", As<Binary>(rightAsTerm.mRight).mOp->Lexeme());
 }
 
+TEST_F(ParserTestFixture, Assign)
+{
+    auto p = GenerateParserFromSource("a=1 999 b=c=2");
+
+    auto assign = As<Assign>(p->ParseAssignment());
+    ASSERT_EQ("a", assign.mName->Lexeme());
+    ASSERT_EQ(1, As<Literal>(assign.mValue).mValue->Number());
+
+    auto literal = As<Literal>(p->ParseAssignment());
+    ASSERT_EQ(999, literal.mValue->Number());
+
+    assign = As<Assign>(p->ParseAssignment());
+    ASSERT_EQ("b", assign.mName->Lexeme());
+    assign = As<Assign>(assign.mValue);
+    ASSERT_EQ("c", assign.mName->Lexeme());
+    ASSERT_EQ(2, As<Literal>(assign.mValue).mValue->Number());
+}
+
 TEST_F(ParserTestFixture, Print)
 {
     auto p = GenerateParserFromSource("print 999; print \"Hello\";");
@@ -185,4 +203,15 @@ TEST_F(ParserTestFixture, VarDeclaration)
     var = As<Var>(p->ParseDeclaration());
     ASSERT_EQ("s", var.mName->Lexeme());
     ASSERT_EQ("hoge", As<Literal>(var.mInitializer).mValue->Text());
+}
+
+TEST_F(ParserTestFixture, Block)
+{
+    auto p = GenerateParserFromSource("{ var a = 1; print a; }");
+
+    auto block = As<Block>(p->ParseStatement());
+
+    ASSERT_EQ(2, block.mStatements.size());
+    ASSERT_NO_THROW(As<Var>(block.mStatements.at(0)));
+    ASSERT_NO_THROW(As<Print>(block.mStatements.at(1)));
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iomanip>
 #include <string>
 
 #define UNSUPPOSED_OPERATION_ERROR(op) throw(UnsupposedValueOperationError("Unsupposed call: " + string(op)));

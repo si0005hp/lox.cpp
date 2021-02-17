@@ -26,6 +26,7 @@ namespace Cclox
 using std::shared_ptr;
 using std::vector;
 
+class Block;
 class Expression;
 class Print;
 class Var;
@@ -36,12 +37,25 @@ class Stmt
     template <class R> class Visitor
     {
       public:
+        virtual R Visit(const Block &stmt) = 0;
         virtual R Visit(const Expression &stmt) = 0;
         virtual R Visit(const Print &stmt) = 0;
         virtual R Visit(const Var &stmt) = 0;
     };
 
     V_STMT_ACCEPT_METHODS
+};
+
+class Block : public Stmt
+{
+  public:
+    Block(vector<shared_ptr<Stmt>> statements) : mStatements(statements)
+    {
+    }
+
+    vector<shared_ptr<Stmt>> mStatements;
+
+    STMT_ACCEPT_METHODS
 };
 
 class Expression : public Stmt

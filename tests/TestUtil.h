@@ -28,6 +28,11 @@ class CcloxTestFixtureBase : public ::testing::Test
         return make_shared<Parser>(scanner.ScanTokens());
     }
 
+    shared_ptr<Token> token(const string &s)
+    {
+        return make_shared<Token>(TOKEN_IDENTIFIER, s, s, 1);
+    }
+
     template <typename T> T As(shared_ptr<Expr> expr)
     {
         shared_ptr<T> tp = static_pointer_cast<T>(expr);
@@ -63,5 +68,14 @@ class CcloxTestFixtureBase : public ::testing::Test
     Binary NextEquality(shared_ptr<Parser> &p)
     {
         return As<Binary>(p->ParseEquality());
+    }
+    Assign NextAssignment(shared_ptr<Parser> &p)
+    {
+        return As<Assign>(p->ParseAssignment());
+    }
+
+    template <typename T> T NextDeclarationAs(shared_ptr<Parser> &p)
+    {
+        return As<T>(p->ParseDeclaration());
     }
 };

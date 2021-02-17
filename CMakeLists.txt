@@ -10,6 +10,7 @@ set(cclox_lib_SRC
   ${PROJECT_SOURCE_DIR}/Scanner.cpp
   ${PROJECT_SOURCE_DIR}/Parser.cpp
   ${PROJECT_SOURCE_DIR}/Interpreter.cpp
+  ${PROJECT_SOURCE_DIR}/Environment.cpp
 )
 
 add_library(cclox_lib ${cclox_lib_SRC})

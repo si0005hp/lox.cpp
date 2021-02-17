@@ -44,6 +44,17 @@ class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
             return Parenthesize2("var", vector<any>{stmt.mName, "=", stmt.mInitializer});
         return Parenthesize2("var", vector<any>{stmt.mName});
     }
+    virtual string Visit(const Block &stmt) override
+    {
+        stringstream ss;
+        ss << "(block ";
+
+        for (auto s : stmt.mStatements)
+            ss << s->Accept(*this);
+
+        ss << ")";
+        return ss.str();
+    }
 
     virtual string Visit(const Assign &expr) override
     {

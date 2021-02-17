@@ -13,7 +13,7 @@ vector<shared_ptr<Stmt>> Parser::Parse()
 {
     vector<shared_ptr<Stmt>> stmts;
     while (!IsAtEnd())
-        stmts.push_back(ParseStatement());
+        stmts.push_back(ParseDeclaration());
     return stmts;
 }
 
@@ -48,11 +48,14 @@ shared_ptr<Stmt> Parser::ParseVarDeclaration()
 }
 
 // statement      → exprStmt
-//                | printStmt;
+//                | printStmt
+//                | block ;
 shared_ptr<Stmt> Parser::ParseStatement()
 {
     if (Match(TOKEN_PRINT))
         return ParsePrintStatement();
+    if (Match(TOKEN_LEFT_BRACE))
+        return ParseBlock();
     return ParseExpressionStatement();
 }
 
@@ -72,22 +75,42 @@ shared_ptr<Stmt> Parser::ParseExpressionStatement()
     return make_shared<Expression>(value);
 }
 
-// TODO: delete as it's temporal
-shared_ptr<Expr> Parser::ParseExpr()
+// block          → "{" declaration* "}" ;
+shared_ptr<Stmt> Parser::ParseBlock()
 {
-    try
-    {
-        return ParseExpression();
-    }
-    catch (const ParseError &error)
-    {
-        return nullptr;
-    }
+    vector<shared_ptr<Stmt>> stmts;
+
+    while (!Check(TOKEN_RIGHT_BRACE) && !IsAtEnd())
+        stmts.push_back(ParseDeclaration());
+
+    Consume(TOKEN_RIGHT_BRACE, "Expect '}' after block.");
+    return make_shared<Block>(stmts);
 }
 
 shared_ptr<Expr> Parser::ParseExpression()
 {
-    return ParseEquality();
+    return ParseAssignment();
+}
+
+// assignment     → IDENTIFIER "=" assignment
+//                | equality ;
+shared_ptr<Expr> Parser::ParseAssignment()
+{
+    auto expr = ParseEquality();
+
+    if (Match(TOKEN_EQUAL))
+    {
+        auto equals = Previous();
+        auto value = ParseAssignment();
+        if (typeid(*expr) == typeid(Variable))
+        {
+            auto name = static_pointer_cast<Variable>(expr)->mName;
+            return make_shared<Assign>(name, value);
+        }
+        Error(*equals, "Invalid assignment target.");
+    }
+
+    return expr;
 }
 
 // equality       → comparison ( ( "!=" | "==" ) comparison )* ;

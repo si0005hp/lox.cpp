@@ -24,26 +24,6 @@ void Interpreter::Interpret(const vector<shared_ptr<Stmt>> &stmts)
     }
 }
 
-// TODO: delete as it's temporal
-shared_ptr<Value> Interpreter::InterpretExpr(const Expr &expr)
-{
-    shared_ptr<Value> value;
-    try
-    {
-        value = Evaluate(expr);
-    }
-    catch (const RuntimeError &e)
-    {
-        Lox::ErrorRuntimeError(e);
-    }
-    return value;
-}
-
-void Interpreter::Execute(const Stmt &stmt)
-{
-    stmt.Accept(*this);
-}
-
 void Interpreter::Visit(const Expression &stmt)
 {
     Evaluate(*stmt.mExpression);
@@ -52,16 +32,26 @@ void Interpreter::Visit(const Expression &stmt)
 void Interpreter::Visit(const Print &stmt)
 {
     auto value = Evaluate(*stmt.mExpression);
-    Println(value->Str());
+    Println(value ? value->Str() : "nil");
 }
 
 void Interpreter::Visit(const Var &stmt)
 {
+    auto value = stmt.mInitializer ? Evaluate(*stmt.mInitializer) : nullptr;
+    mEnvironment->Define(stmt.mName->Lexeme(), value);
+}
+
+void Interpreter::Visit(const Block &stmt)
+{
+    auto newEnvironment = make_shared<Environment>(mEnvironment);
+    ExecuteBlock(stmt.mStatements, newEnvironment);
 }
 
 shared_ptr<Value> Interpreter::Visit(const Assign &expr)
 {
-    return nullptr;
+    auto value = Evaluate(*expr.mValue);
+    mEnvironment->Assign(expr.mName, value);
+    return value;
 }
 
 shared_ptr<Value> Interpreter::Visit(const Binary &expr)
@@ -174,7 +164,28 @@ shared_ptr<Value> Interpreter::Visit(const Unary &expr)
 
 shared_ptr<Value> Interpreter::Visit(const Variable &expr)
 {
-    return nullptr;
+    return mEnvironment->Get(expr.mName);
+}
+
+void Interpreter::Execute(const Stmt &stmt)
+{
+    stmt.Accept(*this);
+}
+
+void Interpreter::ExecuteBlock(const vector<shared_ptr<Stmt>> &stmts, const shared_ptr<Environment> &environment)
+{
+    auto previous = mEnvironment;
+    try
+    {
+        mEnvironment = environment;
+        for (auto stmt : stmts)
+            Execute(*stmt);
+    }
+    catch (...)
+    {
+        // ignore all exceptions
+    }
+    mEnvironment = previous;
 }
 
 shared_ptr<Value> Interpreter::Evaluate(const Expr &expr)
@@ -240,7 +251,7 @@ shared_ptr<Value> Interpreter::InterpretObject(const shared_ptr<Object> &object)
 
 void Interpreter::Println(const string &str) const
 {
-    std::cout << str << std::endl;
+    mOs << str << std::endl;
 }
 
 }; // namespace Cclox
