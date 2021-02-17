@@ -28,17 +28,17 @@ class Scanner
     static const unordered_map<string, TokenType> sKeywords;
 
     void ScanToken();
-    bool IsAtEnd();
+    bool IsAtEnd() const;
     char Advance();
     void AddToken(TokenType type);
     template <typename L> void AddToken(TokenType type, const L &literal);
     bool Match(const char &expected);
-    char Peek();
-    char PeekNext();
+    char Peek() const;
+    char PeekNext() const;
     void String();
-    bool IsDigit(const char &c);
-    bool IsAlpha(const char &c);
-    bool IsAlphaNumeric(const char &c);
+    bool IsDigit(const char &c) const;
+    bool IsAlpha(const char &c) const;
+    bool IsAlphaNumeric(const char &c) const;
     void Number();
     void Identifier();
 

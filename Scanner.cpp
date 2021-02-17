@@ -119,7 +119,7 @@ void Scanner::ScanToken()
     }
 }
 
-bool Scanner::IsAtEnd()
+bool Scanner::IsAtEnd() const
 {
     return mCurrent >= mSource.length();
 }
@@ -152,14 +152,14 @@ bool Scanner::Match(const char &expected)
     return true;
 }
 
-char Scanner::Peek()
+char Scanner::Peek() const
 {
     if (IsAtEnd())
         return '\0';
     return mSource.at(mCurrent);
 }
 
-char Scanner::PeekNext()
+char Scanner::PeekNext() const
 {
     if (mCurrent + 1 >= mSource.length())
         return '\0';
@@ -187,17 +187,17 @@ void Scanner::String()
     AddToken(TOKEN_STRING, value);
 }
 
-bool Scanner::IsDigit(const char &c)
+bool Scanner::IsDigit(const char &c) const
 {
     return c >= '0' && c <= '9';
 }
 
-bool Scanner::IsAlpha(const char &c)
+bool Scanner::IsAlpha(const char &c) const
 {
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-bool Scanner::IsAlphaNumeric(const char &c)
+bool Scanner::IsAlphaNumeric(const char &c) const
 {
     return IsAlpha(c) || IsDigit(c);
 }

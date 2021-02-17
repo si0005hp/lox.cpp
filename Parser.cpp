@@ -206,7 +206,7 @@ bool Parser::Match(const vector<TokenType> &types)
     return false;
 }
 
-bool Parser::Check(const TokenType &type)
+bool Parser::Check(const TokenType &type) const
 {
     if (IsAtEnd())
     {
@@ -224,17 +224,17 @@ shared_ptr<Token> Parser::Advance()
     return Previous();
 }
 
-bool Parser::IsAtEnd()
+bool Parser::IsAtEnd() const
 {
     return Peek()->Type() == TOKEN_EOF;
 }
 
-shared_ptr<Token> Parser::Peek()
+shared_ptr<Token> Parser::Peek() const
 {
     return mTokens.at(mCurrent);
 }
 
-shared_ptr<Token> Parser::Previous()
+shared_ptr<Token> Parser::Previous() const
 {
     return mTokens.at(mCurrent - 1);
 }
@@ -247,7 +247,7 @@ shared_ptr<Token> Parser::Consume(const TokenType &type, const string &message)
     throw(Error(*Peek(), message));
 }
 
-ParseError Parser::Error(const Token &token, const string &message)
+ParseError Parser::Error(const Token &token, const string &message) const
 {
     Lox::Error(token, message);
     return ParseError();

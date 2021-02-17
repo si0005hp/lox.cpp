@@ -53,14 +53,15 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
 
   private:
     shared_ptr<Value> Evaluate(const Expr &expr);
-    bool IsTruthy(const shared_ptr<Value> &value);
-    bool IsEqual(const shared_ptr<Value> &left, const shared_ptr<Value> &right);
-    void CheckNumberOperand(const shared_ptr<Token> op, const shared_ptr<Value> &operand);
-    void CheckNumberOperands(const shared_ptr<Token> op, const shared_ptr<Value> &left, const shared_ptr<Value> &right);
+    bool IsTruthy(const shared_ptr<Value> &value) const;
+    bool IsEqual(const shared_ptr<Value> &left, const shared_ptr<Value> &right) const;
+    void CheckNumberOperand(const shared_ptr<Token> op, const shared_ptr<Value> &operand) const;
+    void CheckNumberOperands(const shared_ptr<Token> op, const shared_ptr<Value> &left,
+                             const shared_ptr<Value> &right) const;
 
-    shared_ptr<Value> InterpretObject(const shared_ptr<Object> &object);
-    shared_ptr<Value> InterpretObject(const Object &object);
-    void Println(const string &str);
+    shared_ptr<Value> InterpretObject(const shared_ptr<Object> &object) const;
+    shared_ptr<Value> InterpretObject(const Object &object) const;
+    void Println(const string &str) const;
 };
 
 }; // namespace Cclox

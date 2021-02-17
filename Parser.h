@@ -63,13 +63,13 @@ class Parser
     bool Match(const TokenType &type);
     bool Match(const vector<TokenType> &types);
 
-    bool Check(const TokenType &type);
+    bool Check(const TokenType &type) const;
     shared_ptr<Token> Advance();
-    bool IsAtEnd();
-    shared_ptr<Token> Peek();
-    shared_ptr<Token> Previous();
+    bool IsAtEnd() const;
+    shared_ptr<Token> Peek() const;
+    shared_ptr<Token> Previous() const;
     shared_ptr<Token> Consume(const TokenType &type, const string &message);
-    ParseError Error(const Token &token, const string &message);
+    ParseError Error(const Token &token, const string &message) const;
     void Synchronize();
 
     const vector<shared_ptr<Token>> mTokens;

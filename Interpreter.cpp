@@ -183,7 +183,7 @@ shared_ptr<Value> Interpreter::Evaluate(const Expr &expr)
 }
 
 // false and nil are falsey and everything else is truthy
-bool Interpreter::IsTruthy(const shared_ptr<Value> &value)
+bool Interpreter::IsTruthy(const shared_ptr<Value> &value) const
 {
     if (!value)
         return false;
@@ -192,7 +192,7 @@ bool Interpreter::IsTruthy(const shared_ptr<Value> &value)
     return true;
 }
 
-bool Interpreter::IsEqual(const shared_ptr<Value> &left, const shared_ptr<Value> &right)
+bool Interpreter::IsEqual(const shared_ptr<Value> &left, const shared_ptr<Value> &right) const
 {
     if (left == nullptr && right == nullptr)
         return true;
@@ -201,7 +201,7 @@ bool Interpreter::IsEqual(const shared_ptr<Value> &left, const shared_ptr<Value>
     return left->Equals(*right);
 }
 
-void Interpreter::CheckNumberOperand(const shared_ptr<Token> op, const shared_ptr<Value> &operand)
+void Interpreter::CheckNumberOperand(const shared_ptr<Token> op, const shared_ptr<Value> &operand) const
 {
     if (operand->IsNumber())
         return;
@@ -209,14 +209,14 @@ void Interpreter::CheckNumberOperand(const shared_ptr<Token> op, const shared_pt
 }
 
 void Interpreter::CheckNumberOperands(const shared_ptr<Token> op, const shared_ptr<Value> &left,
-                                      const shared_ptr<Value> &right)
+                                      const shared_ptr<Value> &right) const
 {
     if (left->IsNumber() && right->IsNumber())
         return;
     throw RuntimeError(op, "Operands must be numbers.");
 }
 
-shared_ptr<Value> Interpreter::InterpretObject(const Object &object)
+shared_ptr<Value> Interpreter::InterpretObject(const Object &object) const
 {
     switch (object.Type())
     {
@@ -233,12 +233,12 @@ shared_ptr<Value> Interpreter::InterpretObject(const Object &object)
     }
 }
 
-shared_ptr<Value> Interpreter::InterpretObject(const shared_ptr<Object> &object)
+shared_ptr<Value> Interpreter::InterpretObject(const shared_ptr<Object> &object) const
 {
     return InterpretObject(*object);
 }
 
-void Interpreter::Println(const string &str)
+void Interpreter::Println(const string &str) const
 {
     std::cout << str << std::endl;
 }
