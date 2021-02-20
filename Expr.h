@@ -65,7 +65,7 @@ class Expr
 class Assign : public Expr
 {
   public:
-    Assign(shared_ptr<Token> name, shared_ptr<Expr> value) : mName(name), mValue(value)
+    Assign(const shared_ptr<Token> &name, const shared_ptr<Expr> &value) : mName(name), mValue(value)
     {
     }
 
@@ -78,7 +78,8 @@ class Assign : public Expr
 class Binary : public Expr
 {
   public:
-    Binary(shared_ptr<Expr> left, shared_ptr<Token> op, shared_ptr<Expr> right) : mLeft(left), mOp(op), mRight(right)
+    Binary(const shared_ptr<Expr> &left, const shared_ptr<Token> &op, const shared_ptr<Expr> &right)
+        : mLeft(left), mOp(op), mRight(right)
     {
     }
 
@@ -92,7 +93,7 @@ class Binary : public Expr
 class Call : public Expr
 {
   public:
-    Call(shared_ptr<Expr> callee, shared_ptr<Token> paren, vector<shared_ptr<Expr>> arguments)
+    Call(const shared_ptr<Expr> &callee, const shared_ptr<Token> &paren, const vector<shared_ptr<Expr>> &arguments)
         : mCallee(callee), mParen(paren), mArguments(arguments)
     {
     }
@@ -107,7 +108,7 @@ class Call : public Expr
 class Get : public Expr
 {
   public:
-    Get(shared_ptr<Expr> object, shared_ptr<Token> name) : mObject(object), mName(name)
+    Get(const shared_ptr<Expr> &object, const shared_ptr<Token> &name) : mObject(object), mName(name)
     {
     }
 
@@ -120,7 +121,7 @@ class Get : public Expr
 class Grouping : public Expr
 {
   public:
-    Grouping(shared_ptr<Expr> expression) : mExpression(expression)
+    Grouping(const shared_ptr<Expr> &expression) : mExpression(expression)
     {
     }
 
@@ -132,7 +133,7 @@ class Grouping : public Expr
 class Literal : public Expr
 {
   public:
-    Literal(shared_ptr<Object> value) : mValue(value)
+    Literal(const shared_ptr<Object> &value) : mValue(value)
     {
     }
 
@@ -144,7 +145,8 @@ class Literal : public Expr
 class Logical : public Expr
 {
   public:
-    Logical(shared_ptr<Expr> left, shared_ptr<Token> op, shared_ptr<Expr> right) : mLeft(left), mOp(op), mRight(right)
+    Logical(const shared_ptr<Expr> &left, const shared_ptr<Token> &op, const shared_ptr<Expr> &right)
+        : mLeft(left), mOp(op), mRight(right)
     {
     }
 
@@ -158,7 +160,7 @@ class Logical : public Expr
 class Set : public Expr
 {
   public:
-    Set(shared_ptr<Expr> object, shared_ptr<Token> name, shared_ptr<Expr> value)
+    Set(const shared_ptr<Expr> &object, const shared_ptr<Token> &name, const shared_ptr<Expr> &value)
         : mObject(object), mName(name), mValue(value)
     {
     }
@@ -173,7 +175,7 @@ class Set : public Expr
 class Super : public Expr
 {
   public:
-    Super(shared_ptr<Token> keyword, shared_ptr<Token> method) : mKeyword(keyword), mMethod(method)
+    Super(const shared_ptr<Token> &keyword, const shared_ptr<Token> &method) : mKeyword(keyword), mMethod(method)
     {
     }
 
@@ -186,7 +188,7 @@ class Super : public Expr
 class This : public Expr
 {
   public:
-    This(shared_ptr<Token> keyword) : mKeyword(keyword)
+    This(const shared_ptr<Token> &keyword) : mKeyword(keyword)
     {
     }
 
@@ -198,7 +200,7 @@ class This : public Expr
 class Unary : public Expr
 {
   public:
-    Unary(shared_ptr<Token> op, shared_ptr<Expr> right) : mOp(op), mRight(right)
+    Unary(const shared_ptr<Token> &op, const shared_ptr<Expr> &right) : mOp(op), mRight(right)
     {
     }
 
@@ -211,7 +213,7 @@ class Unary : public Expr
 class Variable : public Expr
 {
   public:
-    Variable(shared_ptr<Token> name) : mName(name)
+    Variable(const shared_ptr<Token> &name) : mName(name)
     {
     }
 

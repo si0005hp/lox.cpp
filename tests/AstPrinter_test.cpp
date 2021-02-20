@@ -29,11 +29,6 @@ TEST_F(AstPrinterTestFixture, expr_base)
     ASSERT_EQ("foo", p.Visit(Literal(make_shared<Object>("foo"))));
     ASSERT_EQ("12.8", p.Visit(Literal(make_shared<Object>(12.8))));
 
-    // TODO: delete me
-    shared_ptr<Literal> sp = make_shared<Literal>(make_shared<Object>(3));
-    ASSERT_EQ("3", sp->Accept(p));
-    ASSERT_EQ("3", p.Visit(*sp));
-
     // Binary
     ASSERT_EQ("(+ 3 5)",
               p.Visit(Binary(make_shared<Literal>(make_shared<Object>(3)), make_shared<Token>(TOKEN_PLUS, "+", "", 1),

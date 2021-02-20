@@ -115,3 +115,53 @@ TEST_F(InterpreterTestFixture, Block)
 
     ASSERT_EQ("1\n2\n9\n2\n1\n2\n", testOs.str());
 }
+
+TEST_F(InterpreterTestFixture, If)
+{
+    stringstream ss;
+    ss << "if (true) print 1; ";
+    ss << "if (false) print 2; ";
+    ss << "if (true) print 3; else print 4; ";
+    ss << "if (false) print 3; else print 4; ";
+    ss << "if (false) print 5; else if (false) print 6; else print 7; ";
+    auto p = GenerateParserFromSource(ss.str());
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ("1\n3\n4\n7\n", testOs.str());
+}
+
+TEST_F(InterpreterTestFixture, Logical)
+{
+    stringstream ss;
+    ss << "print false or 1; ";
+    ss << "print nil or 2; ";
+    ss << "print true or 3; ";
+    ss << "print 0 or 4; ";
+    ss << "print \"s\" or 5; ";
+    auto p = GenerateParserFromSource(ss.str());
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ("1\n2\ntrue\n0\ns\n", testOs.str());
+}
+
+TEST_F(InterpreterTestFixture, While)
+{
+    stringstream ss;
+    ss << "var c = 0; while (c < 3) print c = c + 1;";
+    ss << "var a = 0; while (a < 3) { print a; a = a + 1; }";
+    auto p = GenerateParserFromSource(ss.str());
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ("1\n2\n3\n0\n1\n2\n", testOs.str());
+}
+
+TEST_F(InterpreterTestFixture, For)
+{
+    stringstream ss;
+    ss << "for (var c = 0; c < 3;) print c = c + 1;";
+    ss << "for (var a = 0; a < 3; a = a + 1) { print a; }";
+    auto p = GenerateParserFromSource(ss.str());
+    i.Interpret(p->Parse());
+
+    ASSERT_EQ("1\n2\n3\n0\n1\n2\n", testOs.str());
+}

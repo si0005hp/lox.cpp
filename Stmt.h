@@ -28,8 +28,10 @@ using std::vector;
 
 class Block;
 class Expression;
+class If;
 class Print;
 class Var;
+class While;
 
 class Stmt
 {
@@ -39,8 +41,10 @@ class Stmt
       public:
         virtual R Visit(const Block &stmt) = 0;
         virtual R Visit(const Expression &stmt) = 0;
+        virtual R Visit(const If &stmt) = 0;
         virtual R Visit(const Print &stmt) = 0;
         virtual R Visit(const Var &stmt) = 0;
+        virtual R Visit(const While &stmt) = 0;
     };
 
     V_STMT_ACCEPT_METHODS
@@ -49,7 +53,7 @@ class Stmt
 class Block : public Stmt
 {
   public:
-    Block(vector<shared_ptr<Stmt>> statements) : mStatements(statements)
+    Block(const vector<shared_ptr<Stmt>> &statements) : mStatements(statements)
     {
     }
 
@@ -61,7 +65,7 @@ class Block : public Stmt
 class Expression : public Stmt
 {
   public:
-    Expression(shared_ptr<Expr> expression) : mExpression(expression)
+    Expression(const shared_ptr<Expr> &expression) : mExpression(expression)
     {
     }
 
@@ -70,10 +74,25 @@ class Expression : public Stmt
     STMT_ACCEPT_METHODS
 };
 
+class If : public Stmt
+{
+  public:
+    If(const shared_ptr<Expr> &condition, const shared_ptr<Stmt> &thenBranch, const shared_ptr<Stmt> &elseBranch)
+        : mCondition(condition), mThenBranch(thenBranch), mElseBranch(elseBranch)
+    {
+    }
+
+    shared_ptr<Expr> mCondition;
+    shared_ptr<Stmt> mThenBranch;
+    shared_ptr<Stmt> mElseBranch;
+
+    STMT_ACCEPT_METHODS
+};
+
 class Print : public Stmt
 {
   public:
-    Print(shared_ptr<Expr> expression) : mExpression(expression)
+    Print(const shared_ptr<Expr> &expression) : mExpression(expression)
     {
     }
 
@@ -85,12 +104,25 @@ class Print : public Stmt
 class Var : public Stmt
 {
   public:
-    Var(shared_ptr<Token> name, shared_ptr<Expr> initializer) : mName(name), mInitializer(initializer)
+    Var(const shared_ptr<Token> &name, const shared_ptr<Expr> &initializer) : mName(name), mInitializer(initializer)
     {
     }
 
     shared_ptr<Token> mName;
     shared_ptr<Expr> mInitializer;
+
+    STMT_ACCEPT_METHODS
+};
+
+class While : public Stmt
+{
+  public:
+    While(const shared_ptr<Expr> &condition, const shared_ptr<Stmt> &body) : mCondition(condition), mBody(body)
+    {
+    }
+
+    shared_ptr<Expr> mCondition;
+    shared_ptr<Stmt> mBody;
 
     STMT_ACCEPT_METHODS
 };

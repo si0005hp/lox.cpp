@@ -27,6 +27,8 @@ const static map<string, string> stmts = {
     {"Print", "shared_ptr<Expr> expression"},
     {"Var", "shared_ptr<Token> name, shared_ptr<Expr> initializer"},
     {"Block", "vector<shared_ptr<Stmt>> statements"},
+    {"If", "shared_ptr<Expr> condition, shared_ptr<Stmt> thenBranch, shared_ptr<Stmt> elseBranch"},
+    {"While", "shared_ptr<Expr> condition, shared_ptr<Stmt> body"},
 };
 
 const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>"};
@@ -95,6 +97,13 @@ string defineVisitor(const string &baseName, const map<string, string> &types)
     return ss.str();
 }
 
+string toConstRefArg(string &fieldEntry)
+{
+    fieldEntry.erase(0, fieldEntry.find_first_not_of(' '));
+    string ref = regex_replace(fieldEntry, regex(" "), " &");
+    return "const " + ref;
+}
+
 void defineAst(const string &baseName, const map<string, string> &types)
 {
     stringstream ss;
@@ -130,7 +139,7 @@ void defineAst(const string &baseName, const map<string, string> &types)
         {
             if (i != 0)
                 ss << ", ";
-            ss << fields[i];
+            ss << toConstRefArg(fields[i]);
         }
         ss << " ) : ";
         for (int i = 0; i < fields.size(); i++)

@@ -49,9 +49,14 @@ class Parser
     shared_ptr<Stmt> ParsePrintStatement();
     shared_ptr<Stmt> ParseExpressionStatement();
     shared_ptr<Stmt> ParseBlock();
+    shared_ptr<Stmt> ParseForStatement();
+    shared_ptr<Stmt> ParseIfStatement();
+    shared_ptr<Stmt> ParseWhileStatement();
 
     shared_ptr<Expr> ParseExpression();
     shared_ptr<Expr> ParseAssignment();
+    shared_ptr<Expr> ParseOr();
+    shared_ptr<Expr> ParseAnd();
     shared_ptr<Expr> ParseEquality();
     shared_ptr<Expr> ParseComparison();
     shared_ptr<Expr> ParseTerm();

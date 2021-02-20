@@ -55,6 +55,17 @@ class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
         ss << ")";
         return ss.str();
     }
+    virtual string Visit(const If &stmt) override
+    {
+        if (!stmt.mElseBranch)
+            return Parenthesize2("if", vector<any>{stmt.mCondition, stmt.mThenBranch});
+
+        return Parenthesize2("if-else", vector<any>{stmt.mCondition, stmt.mThenBranch, stmt.mElseBranch});
+    }
+    virtual string Visit(const While &stmt) override
+    {
+        return Parenthesize2("while", vector<any>{stmt.mCondition, stmt.mBody});
+    }
 
     virtual string Visit(const Assign &expr) override
     {

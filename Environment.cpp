@@ -16,6 +16,13 @@ void Environment::Assign(const shared_ptr<Token> &name, const shared_ptr<Value> 
         mValues[name->Lexeme()] = value;
         return;
     }
+
+    if (mEnclosing)
+    {
+        mEnclosing->Assign(name, value);
+        return;
+    }
+
     throw RuntimeError(name, "Undefined variable '" + name->Lexeme() + "'.");
 }
 

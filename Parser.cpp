@@ -48,15 +48,76 @@ shared_ptr<Stmt> Parser::ParseVarDeclaration()
 }
 
 // statement      → exprStmt
+//                | forStmt
+//                | ifStmt
 //                | printStmt
+//                | whileStmt
 //                | block ;
 shared_ptr<Stmt> Parser::ParseStatement()
 {
+    if (Match(TOKEN_FOR))
+        return ParseForStatement();
+    if (Match(TOKEN_IF))
+        return ParseIfStatement();
     if (Match(TOKEN_PRINT))
         return ParsePrintStatement();
+    if (Match(TOKEN_WHILE))
+        return ParseWhileStatement();
     if (Match(TOKEN_LEFT_BRACE))
         return ParseBlock();
     return ParseExpressionStatement();
+}
+
+// forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+//                            expression? ";"
+//                            expression? ")" statement ;
+shared_ptr<Stmt> Parser::ParseForStatement()
+{
+    Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
+
+    /* parse for syntax parts */
+    shared_ptr<Stmt> initializer;
+    if (Match(TOKEN_SEMICOLON))
+        initializer = nullptr;
+    else if (Match(TOKEN_VAR))
+        initializer = ParseVarDeclaration();
+    else
+        initializer = ParseExpressionStatement();
+
+    auto condition = Check(TOKEN_SEMICOLON) ? nullptr : ParseExpression();
+    Consume(TOKEN_SEMICOLON, "Expect ';' after for loop condition.");
+
+    auto iteration = Check(TOKEN_RIGHT_PAREN) ? nullptr : ParseExpression();
+    Consume(TOKEN_RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    auto body = ParseStatement();
+
+    /* construct to while node */
+    if (iteration)
+        body = make_shared<Block>(vector<shared_ptr<Stmt>>{body, make_shared<Expression>(iteration)});
+
+    if (!condition)
+        condition = make_shared<Literal>(make_shared<Object>(OBJ_BOOL_TRUE));
+    body = make_shared<While>(condition, body);
+
+    if (initializer)
+        body = make_shared<Block>(vector<shared_ptr<Stmt>>{initializer, body});
+
+    return body;
+}
+
+// ifStmt         → "if" "(" expression ")" statement
+//                ( "else" statement )? ;
+shared_ptr<Stmt> Parser::ParseIfStatement()
+{
+    Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
+    auto condition = ParseExpression();
+    Consume(TOKEN_RIGHT_PAREN, "Expect ')' after if condition.");
+
+    auto thenBranch = ParseStatement();
+    auto elseBranch = Match(TOKEN_ELSE) ? ParseStatement() : nullptr;
+
+    return make_shared<If>(condition, thenBranch, elseBranch);
 }
 
 // printStmt      → "print" expression ";" ;
@@ -65,6 +126,17 @@ shared_ptr<Stmt> Parser::ParsePrintStatement()
     shared_ptr<Expr> value = ParseExpression();
     Consume(TOKEN_SEMICOLON, "Expect ';' after value.");
     return make_shared<Print>(value);
+}
+
+// whileStmt      → "while" "(" expression ")" statement ;
+shared_ptr<Stmt> Parser::ParseWhileStatement()
+{
+    Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
+    auto condition = ParseExpression();
+    Consume(TOKEN_RIGHT_PAREN, "Expect ')' after 'while'.");
+    auto body = ParseStatement();
+
+    return make_shared<While>(condition, body);
 }
 
 // exprStmt       → expression ";" ;
@@ -87,16 +159,17 @@ shared_ptr<Stmt> Parser::ParseBlock()
     return make_shared<Block>(stmts);
 }
 
+// expression     → assignment ;
 shared_ptr<Expr> Parser::ParseExpression()
 {
     return ParseAssignment();
 }
 
 // assignment     → IDENTIFIER "=" assignment
-//                | equality ;
+//                | logic_or ;
 shared_ptr<Expr> Parser::ParseAssignment()
 {
-    auto expr = ParseEquality();
+    auto expr = ParseOr(); // TODO change here
 
     if (Match(TOKEN_EQUAL))
     {
@@ -108,6 +181,36 @@ shared_ptr<Expr> Parser::ParseAssignment()
             return make_shared<Assign>(name, value);
         }
         Error(*equals, "Invalid assignment target.");
+    }
+
+    return expr;
+}
+
+// logic_or       → logic_and ( "or" logic_and )* ;
+shared_ptr<Expr> Parser::ParseOr()
+{
+    auto expr = ParseAnd();
+
+    while (Match(TOKEN_OR))
+    {
+        auto op = Previous();
+        auto right = ParseAnd();
+        expr = make_shared<Logical>(expr, op, right);
+    }
+
+    return expr;
+}
+
+// logic_and      → equality ( "and" equality )* ;
+shared_ptr<Expr> Parser::ParseAnd()
+{
+    auto expr = ParseEquality();
+
+    while (Match(TOKEN_AND))
+    {
+        auto op = Previous();
+        auto right = ParseEquality();
+        expr = make_shared<Logical>(expr, op, right);
     }
 
     return expr;

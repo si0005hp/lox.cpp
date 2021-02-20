@@ -47,6 +47,20 @@ void Interpreter::Visit(const Block &stmt)
     ExecuteBlock(stmt.mStatements, newEnvironment);
 }
 
+void Interpreter::Visit(const If &stmt)
+{
+    if (IsTruthy(Evaluate(*stmt.mCondition)))
+        Execute(*stmt.mThenBranch);
+    else if (stmt.mElseBranch)
+        Execute(*stmt.mElseBranch);
+}
+
+void Interpreter::Visit(const While &stmt)
+{
+    while (IsTruthy(Evaluate(*stmt.mCondition)))
+        Execute(*stmt.mBody);
+}
+
 shared_ptr<Value> Interpreter::Visit(const Assign &expr)
 {
     auto value = Evaluate(*expr.mValue);
@@ -127,7 +141,20 @@ shared_ptr<Value> Interpreter::Visit(const Literal &expr)
 
 shared_ptr<Value> Interpreter::Visit(const Logical &expr)
 {
-    return nullptr;
+    auto left = Evaluate(*expr.mLeft);
+
+    if (expr.mOp->Type() == TOKEN_OR)
+    {
+        if (IsTruthy(left))
+            return left;
+    }
+    else
+    {
+        if (!IsTruthy(left))
+            return left;
+    }
+
+    return Evaluate(*expr.mRight);
 }
 
 shared_ptr<Value> Interpreter::Visit(const Set &expr)

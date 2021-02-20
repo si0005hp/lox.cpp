@@ -45,6 +45,8 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     void Visit(const Print &stmt);
     void Visit(const Var &stmt);
     void Visit(const Block &stmt);
+    void Visit(const If &stmt);
+    void Visit(const While &stmt);
 
     shared_ptr<Value> Visit(const Assign &expr);
     shared_ptr<Value> Visit(const Binary &expr);
