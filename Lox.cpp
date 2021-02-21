@@ -1,12 +1,80 @@
 #include "Lox.h"
+#include "Interpreter.h"
+#include "Parser.h"
+#include "Scanner.h"
 
+#include <fstream>
 #include <iostream>
 #include <string>
 
-namespace Cclox
+namespace cclox
 {
 
+using std::ifstream;
 using std::string;
+
+string ReadFile(const string &fileName)
+{
+    ifstream file;
+    file.open(fileName);
+    if (file.fail())
+    {
+        // TODO error
+    }
+
+    stringstream ss;
+    string line;
+    while (getline(file, line))
+        ss << line << std::endl;
+
+    return ss.str();
+}
+
+void DoInterpret(Interpreter &interpreter, const string &source)
+{
+    Scanner s(source);
+    Parser p(s.ScanTokens());
+    interpreter.Interpret(p.Parse());
+}
+
+void Lox::RunFile(const string &fileName)
+{
+    Interpreter interpreter;
+
+    DoInterpret(interpreter, ReadFile(fileName));
+}
+
+void Lox::RunFile(const string &fileName, std::ostream &os)
+{
+    Interpreter interpreter(os);
+
+    DoInterpret(interpreter, ReadFile(fileName));
+}
+
+void Lox::RunRepl()
+{
+    Interpreter interpreter;
+
+    bool isFirstLine = false;
+    while (true)
+    {
+        if (isFirstLine)
+        {
+            std::cout << ">> ";
+            isFirstLine = false;
+        }
+        else
+        {
+            std::cout << ".. ";
+        }
+
+        string line;
+        while (line.size() == 0)
+            std::getline(std::cin, line);
+
+        DoInterpret(interpreter, line);
+    }
+}
 
 bool Lox::sHadError = false;
 
@@ -40,4 +108,4 @@ void Lox::Report(const int &line, const string &where, const string &message)
     sHadError = true;
 }
 
-} // namespace Cclox
+} // namespace cclox

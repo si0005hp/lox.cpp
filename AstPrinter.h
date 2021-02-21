@@ -7,7 +7,7 @@
 #include <string>
 #include <type_traits>
 
-namespace Cclox
+namespace cclox
 {
 
 using std::any;
@@ -65,6 +65,31 @@ class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
     virtual string Visit(const While &stmt) override
     {
         return Parenthesize2("while", vector<any>{stmt.mCondition, stmt.mBody});
+    }
+    virtual string Visit(const Function &stmt) override
+    {
+        stringstream ss;
+        ss << "(fun" << stmt.mName->Lexeme() << "(";
+
+        for (size_t i = 0; i < stmt.mParams.size(); i++)
+        {
+            if (i != 0)
+                ss << " ";
+            ss << stmt.mParams.at(i)->Lexeme();
+        }
+        ss << ") ";
+
+        for (auto s : stmt.mBody)
+            s->Accept(*this);
+        ss << ")";
+
+        return ss.str();
+    }
+    virtual string Visit(const Return &stmt) override
+    {
+        if (!stmt.mValue)
+            return "(return)";
+        return Parenthesize("return", vector<shared_ptr<Expr>>{stmt.mValue});
     }
 
     virtual string Visit(const Assign &expr) override
@@ -196,4 +221,4 @@ class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
     }
 };
 
-}; // namespace Cclox
+}; // namespace cclox

@@ -4,7 +4,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-using namespace Cclox;
+using namespace cclox;
 using namespace std;
 
 class InterpreterTestFixture : public CcloxTestFixtureBase
@@ -14,7 +14,7 @@ class InterpreterTestFixture : public CcloxTestFixtureBase
     Interpreter i;
     const Environment &iEnv;
 
-    InterpreterTestFixture() : i(Interpreter(testOs)), iEnv(i.GetEnvironment())
+    InterpreterTestFixture() : i(Interpreter(testOs)), iEnv(i.CEnvironment())
     {
     }
     void SetUp()

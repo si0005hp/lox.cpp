@@ -4,7 +4,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-using namespace Cclox;
+using namespace cclox;
 using namespace std;
 
 class EnvironmentTestFixture : public CcloxTestFixtureBase

@@ -1,6 +1,6 @@
 #include "Parser.h"
 
-namespace Cclox
+namespace cclox
 {
 
 using std::shared_ptr;
@@ -25,6 +25,8 @@ shared_ptr<Stmt> Parser::ParseDeclaration()
 {
     try
     {
+        if (Match(TOKEN_FUN))
+            return ParseFunction("function");
         if (Match(TOKEN_VAR))
             return ParseVarDeclaration();
         return ParseStatement();
@@ -34,6 +36,31 @@ shared_ptr<Stmt> Parser::ParseDeclaration()
         Synchronize();
         return nullptr;
     }
+}
+
+// funDecl        → "fun" function ;
+// function       → IDENTIFIER "(" parameters? ")" block ;
+shared_ptr<Stmt> Parser::ParseFunction(const string &kind)
+{
+    auto name = Consume(TOKEN_IDENTIFIER, "Expect " + kind + " name.");
+
+    Consume(TOKEN_LEFT_PAREN, "Expect '(' after " + kind + " name.");
+    vector<shared_ptr<Token>> params;
+    if (!Check(TOKEN_RIGHT_PAREN))
+    {
+        do
+        {
+            if (params.size() >= 255)
+                Error(*Peek(), "Can't have more than 255 parameters.");
+
+            params.push_back(Consume(TOKEN_IDENTIFIER, "Expect parameter name."));
+        } while (Match(TOKEN_COMMA));
+    }
+    Consume(TOKEN_RIGHT_PAREN, "Expect ')' after parameters.");
+
+    Consume(TOKEN_LEFT_BRACE, "Expect '{' before " + kind + " body.");
+    auto body = static_pointer_cast<Block>(ParseBlock())->mStatements;
+    return make_shared<Function>(name, params, body);
 }
 
 // varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
@@ -51,6 +78,7 @@ shared_ptr<Stmt> Parser::ParseVarDeclaration()
 //                | forStmt
 //                | ifStmt
 //                | printStmt
+//                | returnStmt
 //                | whileStmt
 //                | block ;
 shared_ptr<Stmt> Parser::ParseStatement()
@@ -61,6 +89,8 @@ shared_ptr<Stmt> Parser::ParseStatement()
         return ParseIfStatement();
     if (Match(TOKEN_PRINT))
         return ParsePrintStatement();
+    if (Match(TOKEN_RETURN))
+        return ParseReturnStatement();
     if (Match(TOKEN_WHILE))
         return ParseWhileStatement();
     if (Match(TOKEN_LEFT_BRACE))
@@ -126,6 +156,16 @@ shared_ptr<Stmt> Parser::ParsePrintStatement()
     shared_ptr<Expr> value = ParseExpression();
     Consume(TOKEN_SEMICOLON, "Expect ';' after value.");
     return make_shared<Print>(value);
+}
+
+// returnStmt     → "return" expression? ";" ;
+shared_ptr<Stmt> Parser::ParseReturnStatement()
+{
+    auto keyword = Previous();
+    auto value = Check(TOKEN_SEMICOLON) ? nullptr : ParseExpression();
+
+    Consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
+    return make_shared<Return>(keyword, value);
 }
 
 // whileStmt      → "while" "(" expression ")" statement ;
@@ -273,8 +313,7 @@ shared_ptr<Expr> Parser::ParseFactor()
     return expr;
 }
 
-// unary          → ( "!" | "-" ) unary
-//                | primary ;
+// unary          → ( "!" | "-" ) unary | call ;
 shared_ptr<Expr> Parser::ParseUnary()
 {
     if (Match(vector<TokenType>{TOKEN_BANG, TOKEN_MINUS}))
@@ -283,7 +322,40 @@ shared_ptr<Expr> Parser::ParseUnary()
         auto right = ParseUnary();
         return make_shared<Unary>(op, right);
     }
-    return ParsePrimary();
+    return ParseCall();
+}
+
+// call           → primary ( "(" arguments? ")" )* ;
+// arguments      → expression ( "," expression )* ;
+shared_ptr<Expr> Parser::ParseCall()
+{
+    auto expr = ParsePrimary();
+
+    while (true)
+        if (Match(TOKEN_LEFT_PAREN))
+            expr = FinishCall(expr);
+        else
+            break;
+
+    return expr;
+}
+
+shared_ptr<Expr> Parser::FinishCall(const shared_ptr<Expr> &callee)
+{
+    vector<shared_ptr<Expr>> arguments;
+    if (!Check(TOKEN_RIGHT_PAREN))
+    {
+        do
+        {
+            if (arguments.size() >= 255)
+                Error(*Peek(), "Can't have more than 255 arguments.");
+
+            arguments.push_back(ParseExpression());
+        } while (Match(TOKEN_COMMA));
+    }
+
+    auto paren = Consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
+    return make_shared<Call>(callee, paren, arguments);
 }
 
 // primary        → "true" | "false" | "nil" | "this"
@@ -406,4 +478,4 @@ void Parser::Synchronize()
     }
 }
 
-} // namespace Cclox
+} // namespace cclox

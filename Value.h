@@ -1,15 +1,19 @@
 #pragma once
 
 #include <iomanip>
+#include <memory>
 #include <string>
 
 #define UNSUPPOSED_OPERATION_ERROR(op) throw(UnsupposedValueOperationError("Unsupposed call: " + string(op)));
 
-namespace Cclox
+namespace cclox
 {
 
 using std::exception;
+using std::shared_ptr;
 using std::string;
+
+class LoxFunction;
 
 class UnsupposedValueOperationError : public exception
 {
@@ -39,10 +43,28 @@ class Value
     {
         UNSUPPOSED_OPERATION_ERROR("AsBoolean")
     }
+    virtual const LoxFunction &AsFunction() const
+    {
+        UNSUPPOSED_OPERATION_ERROR("AsFunction")
+    }
 
-    virtual const bool IsString() const = 0;
-    virtual const bool IsNumber() const = 0;
-    virtual const bool IsBoolean() const = 0;
+    virtual const bool IsString() const
+    {
+        return false;
+    }
+    virtual const bool IsNumber() const
+    {
+        return false;
+    }
+    virtual const bool IsBoolean() const
+    {
+        return false;
+    }
+    virtual const bool IsFunction() const
+    {
+        return false;
+    }
+
     virtual const bool Equals(const Value &other) const = 0;
 
     virtual const string Str() const = 0;
@@ -62,14 +84,6 @@ class StringValue : public Value
     virtual const bool IsString() const override
     {
         return true;
-    }
-    virtual const bool IsNumber() const override
-    {
-        return false;
-    }
-    virtual const bool IsBoolean() const override
-    {
-        return false;
     }
 
     virtual const bool Equals(const Value &other) const override
@@ -97,17 +111,9 @@ class NumberValue : public Value
         return mValue;
     }
 
-    virtual const bool IsString() const override
-    {
-        return false;
-    }
     virtual const bool IsNumber() const override
     {
         return true;
-    }
-    virtual const bool IsBoolean() const override
-    {
-        return false;
     }
 
     virtual const bool Equals(const Value &other) const override
@@ -137,14 +143,6 @@ class BooleanValue : public Value
         return mValue;
     }
 
-    virtual const bool IsString() const override
-    {
-        return false;
-    }
-    virtual const bool IsNumber() const override
-    {
-        return false;
-    }
     virtual const bool IsBoolean() const override
     {
         return true;
@@ -164,4 +162,4 @@ class BooleanValue : public Value
     bool mValue;
 };
 
-}; // namespace Cclox
+} // namespace cclox

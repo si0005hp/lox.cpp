@@ -1,0 +1,42 @@
+fun args(a, b) {
+  print a + b;
+}
+args(3, 6);
+args("Hi, ", "there");
+print(args(1, 1));
+
+
+fun argsAndLocalVars(a, b) {
+  var c;
+  c = a - b;
+  a = 99;
+  var d = c / 2;
+  
+  print a;
+  print b;
+  print c;
+  print d;
+}
+argsAndLocalVars(11, 2);
+argsAndLocalVars(3, 10);
+
+
+fun child1() {
+  return 1;
+}
+fun child2(num) {
+  return num * 5;
+}
+fun parent(value) {
+  var one = 0;
+  for (var i = 0; i < value; i = i + 1) {
+    one = one + child1();
+  }
+  var two = child2(value);
+  print(one + two);
+}
+parent(2);
+parent(30);
+
+print(child1);
+print(parent);

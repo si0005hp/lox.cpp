@@ -2,7 +2,7 @@
 
 #include "Lox.h"
 
-namespace Cclox
+namespace cclox
 {
 
 const vector<shared_ptr<Token>> &Scanner::ScanTokens()
@@ -71,9 +71,7 @@ void Scanner::ScanToken()
         {
             // A comment goes until the end of the line.
             while (Peek() != '\n' && !IsAtEnd())
-            {
                 Advance();
-            }
         }
         else
         {
@@ -221,4 +219,4 @@ void Scanner::Identifier()
     AddToken(type);
 }
 
-} // namespace Cclox
+} // namespace cclox

@@ -1,7 +1,7 @@
 #include "Environment.h"
 #include "Interpreter.h"
 
-namespace Cclox
+namespace cclox
 {
 
 void Environment::Define(const string &name, const shared_ptr<Value> &value)
@@ -37,4 +37,4 @@ shared_ptr<Value> Environment::Get(const shared_ptr<Token> &name) const
     throw RuntimeError(name, "Undefined variable '" + name->Lexeme() + "'.");
 }
 
-} // namespace Cclox
+} // namespace cclox

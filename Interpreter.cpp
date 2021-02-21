@@ -1,10 +1,19 @@
 #include "Interpreter.h"
 #include "Lox.h"
+#include "LoxFunction.h"
 
-namespace Cclox
+namespace cclox
 {
 
 using std::make_shared;
+
+Interpreter::Interpreter() : Interpreter(std::cout)
+{
+}
+
+Interpreter::Interpreter(std::ostream &os) : mGlobals(make_shared<Environment>()), mEnvironment(mGlobals), mOs(os)
+{
+}
 
 template <typename T, typename V> shared_ptr<Value> LoxValue(const V &value)
 {
@@ -59,6 +68,19 @@ void Interpreter::Visit(const While &stmt)
 {
     while (IsTruthy(Evaluate(*stmt.mCondition)))
         Execute(*stmt.mBody);
+}
+
+void Interpreter::Visit(const Function &stmt)
+{
+    auto function = make_shared<LoxFunction>(stmt, mEnvironment);
+    mEnvironment->Define(stmt.mName->Lexeme(), function);
+}
+
+void Interpreter::Visit(const Return &stmt)
+{
+    auto value = stmt.mValue ? Evaluate(*stmt.mValue) : nullptr;
+
+    throw FunctionReturn(value);
 }
 
 shared_ptr<Value> Interpreter::Visit(const Assign &expr)
@@ -121,7 +143,22 @@ shared_ptr<Value> Interpreter::Visit(const Binary &expr)
 
 shared_ptr<Value> Interpreter::Visit(const Call &expr)
 {
-    return nullptr;
+    auto callee = Evaluate(*expr.mCallee);
+
+    vector<shared_ptr<Value>> arguments;
+    for (auto argument : expr.mArguments)
+        arguments.push_back(Evaluate(*argument));
+
+    if (!callee->IsFunction())
+        throw RuntimeError(expr.mParen, "Can only call functions and classes.");
+
+    auto function = callee->AsFunction();
+
+    if (arguments.size() != function.Arity())
+        throw RuntimeError(expr.mParen, "Expected " + to_string(function.Arity()) + " arguments but got " +
+                                            to_string(arguments.size()) + ".");
+
+    return function.Call(*this, arguments);
 }
 
 shared_ptr<Value> Interpreter::Visit(const Get &expr)
@@ -208,9 +245,11 @@ void Interpreter::ExecuteBlock(const vector<shared_ptr<Stmt>> &stmts, const shar
         for (auto stmt : stmts)
             Execute(*stmt);
     }
-    catch (...)
+    catch (const FunctionReturn &returnValue)
     {
-        // ignore all exceptions
+        // TODO fix
+        mEnvironment = previous;
+        throw returnValue;
     }
     mEnvironment = previous;
 }
@@ -281,4 +320,4 @@ void Interpreter::Println(const string &str) const
     mOs << str << std::endl;
 }
 
-}; // namespace Cclox
+}; // namespace cclox

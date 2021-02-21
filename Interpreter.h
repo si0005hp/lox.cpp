@@ -2,12 +2,13 @@
 
 #include "Environment.h"
 #include "Expr.h"
+#include "LoxCallable.h"
 #include "Stmt.h"
 #include "Value.h"
 #include <iostream>
 #include <memory>
 
-namespace Cclox
+namespace cclox
 {
 
 using std::exception;
@@ -31,13 +32,11 @@ class RuntimeError : public exception
 
 class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visitor<void>
 {
+    friend class LoxFunction;
+
   public:
-    Interpreter() : mEnvironment(make_shared<Environment>()), mOs(std::cout)
-    {
-    }
-    Interpreter(std::ostream &os) : mEnvironment(make_shared<Environment>()), mOs(os)
-    {
-    }
+    Interpreter();
+    Interpreter(std::ostream &os);
 
     void Interpret(const vector<shared_ptr<Stmt>> &stmts);
 
@@ -47,6 +46,8 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     void Visit(const Block &stmt);
     void Visit(const If &stmt);
     void Visit(const While &stmt);
+    void Visit(const Function &stmt);
+    void Visit(const Return &stmt);
 
     shared_ptr<Value> Visit(const Assign &expr);
     shared_ptr<Value> Visit(const Binary &expr);
@@ -62,7 +63,7 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     shared_ptr<Value> Visit(const Variable &expr);
 
     // for test
-    const Environment &GetEnvironment() const
+    const Environment &CEnvironment() const
     {
         return *mEnvironment;
     }
@@ -81,9 +82,10 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     shared_ptr<Value> InterpretObject(const Object &object) const;
     void Println(const string &str) const;
 
+    shared_ptr<Environment> mGlobals;
     shared_ptr<Environment> mEnvironment;
 
     std::ostream &mOs;
 };
 
-}; // namespace Cclox
+} // namespace cclox

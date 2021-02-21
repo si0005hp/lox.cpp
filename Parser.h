@@ -8,7 +8,7 @@
 #include "Stmt.h"
 #include "Token.h"
 
-namespace Cclox
+namespace cclox
 {
 
 using std::exception;
@@ -44,6 +44,7 @@ class Parser
     /* public scope for test */
     shared_ptr<Stmt> ParseDeclaration();
     shared_ptr<Stmt> ParseVarDeclaration();
+    shared_ptr<Stmt> ParseFunction(const string &kind);
 
     shared_ptr<Stmt> ParseStatement();
     shared_ptr<Stmt> ParsePrintStatement();
@@ -51,6 +52,7 @@ class Parser
     shared_ptr<Stmt> ParseBlock();
     shared_ptr<Stmt> ParseForStatement();
     shared_ptr<Stmt> ParseIfStatement();
+    shared_ptr<Stmt> ParseReturnStatement();
     shared_ptr<Stmt> ParseWhileStatement();
 
     shared_ptr<Expr> ParseExpression();
@@ -62,6 +64,7 @@ class Parser
     shared_ptr<Expr> ParseTerm();
     shared_ptr<Expr> ParseFactor();
     shared_ptr<Expr> ParseUnary();
+    shared_ptr<Expr> ParseCall();
     shared_ptr<Expr> ParsePrimary();
 
   private:
@@ -76,9 +79,10 @@ class Parser
     shared_ptr<Token> Consume(const TokenType &type, const string &message);
     ParseError Error(const Token &token, const string &message) const;
     void Synchronize();
+    shared_ptr<Expr> FinishCall(const shared_ptr<Expr> &callee);
 
     const vector<shared_ptr<Token>> mTokens;
     int mCurrent = 0;
 };
 
-} // namespace Cclox
+} // namespace cclox

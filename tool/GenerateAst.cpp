@@ -29,6 +29,8 @@ const static map<string, string> stmts = {
     {"Block", "vector<shared_ptr<Stmt>> statements"},
     {"If", "shared_ptr<Expr> condition, shared_ptr<Stmt> thenBranch, shared_ptr<Stmt> elseBranch"},
     {"While", "shared_ptr<Expr> condition, shared_ptr<Stmt> body"},
+    {"Function", "shared_ptr<Token> name, vector<shared_ptr<Token>> params, vector<shared_ptr<Stmt>> body"},
+    {"Return", "shared_ptr<Token> keyword, shared_ptr<Expr> value"},
 };
 
 const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>"};
@@ -211,7 +213,7 @@ int main(int argc, char const *argv[])
     else
         defineMacro("Expr", exprVisitorTypes);
 
-    cout << "namespace Cclox";
+    cout << "namespace cclox";
     cout << " { ";
     cout << endl << endl;
     cout << "using std::shared_ptr;";

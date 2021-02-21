@@ -5,12 +5,16 @@
 #include "Interpreter.h"
 #include "Token.h"
 
-namespace Cclox
+namespace cclox
 {
 
 class Lox
 {
   public:
+    static void RunFile(const string &fileName);
+    static void RunFile(const string &fileName, std::ostream &os);
+    static void RunRepl();
+
     static void Error(const int &line, const string &message);
     static void Error(const Token &token, const string &message);
 
@@ -22,4 +26,4 @@ class Lox
     static bool sHadError;
 };
 
-} // namespace Cclox
+} // namespace cclox

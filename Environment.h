@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace Cclox
+namespace cclox
 {
 
 using std::shared_ptr;
@@ -16,7 +16,7 @@ using std::unordered_map;
 class Environment
 {
   public:
-    Environment() : mEnclosing(nullptr)
+    Environment() : Environment(nullptr)
     {
     }
     Environment(const shared_ptr<Environment> &enclosing) : mEnclosing(enclosing)
@@ -33,4 +33,4 @@ class Environment
     unordered_map<string, shared_ptr<Value>> mValues;
 };
 
-} // namespace Cclox
+} // namespace cclox
