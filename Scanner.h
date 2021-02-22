@@ -25,7 +25,12 @@ class Scanner
     const vector<shared_ptr<Token>> &ScanTokens();
 
   private:
-    static const unordered_map<string, TokenType> sKeywords;
+    inline static const unordered_map<string, TokenType> sKeywords = {
+        {"and", TOKEN_AND},   {"class", TOKEN_CLASS}, {"else", TOKEN_ELSE},     {"false", TOKEN_FALSE},
+        {"for", TOKEN_FOR},   {"fun", TOKEN_FUN},     {"if", TOKEN_IF},         {"nil", TOKEN_NIL},
+        {"or", TOKEN_OR},     {"print", TOKEN_PRINT}, {"return", TOKEN_RETURN}, {"super", TOKEN_SUPER},
+        {"this", TOKEN_THIS}, {"true", TOKEN_TRUE},   {"var", TOKEN_VAR},       {"while", TOKEN_WHILE},
+    };
 
     void ScanToken();
     bool IsAtEnd() const;
