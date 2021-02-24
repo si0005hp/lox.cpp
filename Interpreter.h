@@ -62,6 +62,8 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     shared_ptr<Value> Visit(const Unary &expr);
     shared_ptr<Value> Visit(const Variable &expr);
 
+    void Resolve(const Expr &expr, int depth);
+
     // for test
     const Environment &CEnvironment() const
     {

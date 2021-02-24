@@ -33,7 +33,7 @@ const static map<string, string> stmts = {
     {"Return", "shared_ptr<Token> keyword, shared_ptr<Expr> value"},
 };
 
-const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>"};
+const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>", "void"};
 
 const static vector<string> stmtVisitorTypes = {"string", "void"};
 

@@ -12,6 +12,7 @@ set(cclox_lib_SRC
   ${PROJECT_SOURCE_DIR}/Interpreter.cpp
   ${PROJECT_SOURCE_DIR}/Environment.cpp
   ${PROJECT_SOURCE_DIR}/LoxFunction.cpp
+  ${PROJECT_SOURCE_DIR}/Resolver.cpp
 )
 
 add_library(cclox_lib ${cclox_lib_SRC})

@@ -231,6 +231,11 @@ shared_ptr<Value> Interpreter::Visit(const Variable &expr)
     return mEnvironment->Get(expr.mName);
 }
 
+void Interpreter::Resolve(const Expr &expr, int depth)
+{
+    // TODO
+}
+
 void Interpreter::Execute(const Stmt &stmt)
 {
     stmt.Accept(*this);

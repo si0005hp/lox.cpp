@@ -8,7 +8,8 @@
 
 #define V_EXPR_ACCEPT_METHODS                                                                                          \
     virtual string Accept(Visitor<string> &visitor) const = 0;                                                         \
-    virtual shared_ptr<Value> Accept(Visitor<shared_ptr<Value>> &visitor) const = 0;
+    virtual shared_ptr<Value> Accept(Visitor<shared_ptr<Value>> &visitor) const = 0;                                   \
+    virtual void Accept(Visitor<void> &visitor) const = 0;
 
 #define EXPR_ACCEPT_METHODS                                                                                            \
     string Accept(Visitor<string> &visitor) const override                                                             \
@@ -16,6 +17,10 @@
         return visitor.Visit(*this);                                                                                   \
     }                                                                                                                  \
     shared_ptr<Value> Accept(Visitor<shared_ptr<Value>> &visitor) const override                                       \
+    {                                                                                                                  \
+        return visitor.Visit(*this);                                                                                   \
+    }                                                                                                                  \
+    void Accept(Visitor<void> &visitor) const override                                                                 \
     {                                                                                                                  \
         return visitor.Visit(*this);                                                                                   \
     }
