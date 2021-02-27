@@ -14,6 +14,7 @@ namespace cclox
 using std::exception;
 using std::make_shared;
 using std::shared_ptr;
+using std::unordered_map;
 
 class RuntimeError : public exception
 {
@@ -79,6 +80,7 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     void CheckNumberOperand(const shared_ptr<Token> op, const shared_ptr<Value> &operand) const;
     void CheckNumberOperands(const shared_ptr<Token> op, const shared_ptr<Value> &left,
                              const shared_ptr<Value> &right) const;
+    shared_ptr<Value> LookUpVariable(const shared_ptr<Token> &name, const Expr &expr) const;
 
     shared_ptr<Value> InterpretObject(const shared_ptr<Object> &object) const;
     shared_ptr<Value> InterpretObject(const Object &object) const;
@@ -86,6 +88,8 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
 
     shared_ptr<Environment> mGlobals;
     shared_ptr<Environment> mEnvironment;
+
+    unordered_map<const Expr *, int> mLocals;
 
     std::ostream &mOs;
 };

@@ -9,11 +9,12 @@
 namespace cclox
 {
 
+using std::enable_shared_from_this;
 using std::shared_ptr;
 using std::string;
 using std::unordered_map;
 
-class Environment
+class Environment : public enable_shared_from_this<Environment>
 {
   public:
     Environment() : Environment(nullptr)
@@ -25,7 +26,11 @@ class Environment
 
     void Define(const string &name, const shared_ptr<Value> &value);
     void Assign(const shared_ptr<Token> &name, const shared_ptr<Value> &value);
+    void AssignAt(int distance, const shared_ptr<Token> &name, const shared_ptr<Value> &value);
     shared_ptr<Value> Get(const shared_ptr<Token> &name) const;
+    shared_ptr<Value> GetAt(int distance, const string &name) const;
+    shared_ptr<Environment> Ancestor(int distance);
+    shared_ptr<const Environment> Ancestor(int distance) const;
 
   private:
     shared_ptr<Environment> mEnclosing;

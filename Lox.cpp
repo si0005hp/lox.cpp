@@ -1,6 +1,7 @@
 #include "Lox.h"
 #include "Interpreter.h"
 #include "Parser.h"
+#include "Resolver.h"
 #include "Scanner.h"
 
 #include <fstream>
@@ -30,11 +31,23 @@ string ReadFile(const string &fileName)
     return ss.str();
 }
 
-void DoInterpret(Interpreter &interpreter, const string &source)
+void Lox::DoInterpret(Interpreter &interpreter, const string &source)
 {
     Scanner s(source);
     Parser p(s.ScanTokens());
-    interpreter.Interpret(p.Parse());
+
+    auto stmts = p.Parse();
+
+    if (sHadError)
+        return;
+
+    Resolver r(interpreter);
+    r.Resolve(stmts);
+
+    if (sHadError)
+        return;
+
+    interpreter.Interpret(stmts);
 }
 
 void Lox::RunFile(const string &fileName)
@@ -75,8 +88,6 @@ void Lox::RunRepl()
         DoInterpret(interpreter, line);
     }
 }
-
-bool Lox::sHadError = false;
 
 void Lox::Error(const int &line, const string &message)
 {

@@ -20,10 +20,21 @@ class Lox
 
     static void ErrorRuntimeError(const RuntimeError &error);
 
+    /* for test */
+    static bool HadError()
+    {
+        return sHadError;
+    }
+    static void ResetError()
+    {
+        sHadError = false;
+    }
+
   private:
     static void Report(const int &line, const string &where, const string &message);
+    static void DoInterpret(Interpreter &interpreter, const string &source);
 
-    static bool sHadError;
+    inline static bool sHadError = false;
 };
 
 } // namespace cclox

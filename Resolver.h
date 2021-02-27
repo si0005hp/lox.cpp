@@ -13,12 +13,20 @@ using std::deque;
 using std::string;
 using std::unordered_map;
 
+enum FunctionType
+{
+    FUNCTION_NONE,
+    FUNCTION_FUNCTION,
+};
+
 class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
 {
   public:
     Resolver(Interpreter &interpreter) : mInterpreter(interpreter)
     {
     }
+
+    void Resolve(const vector<shared_ptr<Stmt>> &statements);
 
     void Visit(const Expression &stmt);
     void Visit(const Print &stmt);
@@ -43,7 +51,6 @@ class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
     void Visit(const Variable &expr);
 
   private:
-    void Resolve(const vector<shared_ptr<Stmt>> statements);
     void Resolve(const Stmt &stmt);
     void Resolve(const Expr &expr);
     void BeginScope();
@@ -51,10 +58,12 @@ class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
     void Declare(const Token &name);
     void Define(const Token &name);
     void ResolveLocal(const Expr &expr, const Token &name);
-    void ResolveFunction(const Function &func);
+    void ResolveFunction(const Function &func, FunctionType type);
 
     Interpreter &mInterpreter;
     deque<unordered_map<string, bool>> mScopes;
+
+    FunctionType mCurrentFunction = FUNCTION_NONE;
 };
 
 } // namespace cclox

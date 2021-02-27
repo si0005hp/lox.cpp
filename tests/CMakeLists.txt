@@ -28,5 +28,6 @@ package_add_test(cclox_test
   Interpreter_test.cpp
   Value_test.cpp
   Environment_test.cpp
+  Resolver_test.cpp
   Integration_test.cpp
 )

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Lox.h"
 #include "Parser.h"
+#include "Resolver.h"
 #include "Scanner.h"
 
 #include "gmock/gmock.h"
@@ -24,8 +26,40 @@ class CcloxTestFixtureBase : public ::testing::Test
 
     shared_ptr<Parser> GenerateParserFromSource(const string &source)
     {
-        Scanner scanner(source);
-        return make_shared<Parser>(scanner.ScanTokens());
+        Scanner s(source);
+        return make_shared<Parser>(s.ScanTokens());
+    }
+
+    vector<shared_ptr<Stmt>> ParseAndResolve(Interpreter &interpreter, const string &source)
+    {
+        Scanner s(source);
+        Parser p(s.ScanTokens());
+
+        auto stmts = p.Parse();
+
+        if (Lox::HadError())
+            return vector<shared_ptr<Stmt>>();
+
+        Resolver r(interpreter);
+        r.Resolve(stmts);
+
+        if (Lox::HadError())
+            return vector<shared_ptr<Stmt>>();
+
+        return stmts;
+    }
+
+    void WithParsedAndResolvedStmts(Interpreter &interpreter, const string &source,
+                                    const function<void(const vector<shared_ptr<Stmt>> &stmts)> &proc)
+    {
+        auto stmts = ParseAndResolve(interpreter, source);
+
+        if (Lox::HadError())
+            throw std::runtime_error("[ParseAndResolve] failed.");
+
+        proc(stmts);
+
+        Lox::ResetError();
     }
 
     shared_ptr<Token> token(const string &s)

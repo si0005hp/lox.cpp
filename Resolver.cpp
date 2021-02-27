@@ -1,12 +1,18 @@
 #include "Resolver.h"
 #include "Lox.h"
+#include <iostream>
 
 namespace cclox
 {
 
+void Resolver::Resolve(const vector<shared_ptr<Stmt>> &statements)
+{
+    for (auto stmt : statements)
+        Resolve(*stmt);
+}
 void Resolver::Visit(const Expression &stmt)
 {
-    Resolve(stmt);
+    Resolve(*stmt.mExpression);
 }
 
 void Resolver::Visit(const Print &stmt)
@@ -48,11 +54,14 @@ void Resolver::Visit(const Function &stmt)
     Declare(*stmt.mName);
     Define(*stmt.mName);
 
-    ResolveFunction(stmt);
+    ResolveFunction(stmt, FUNCTION_FUNCTION);
 }
 
 void Resolver::Visit(const Return &stmt)
 {
+    if (mCurrentFunction == FUNCTION_NONE)
+        Lox::Error(*stmt.mKeyword, "Can't return from top-level code.");
+
     if (stmt.mValue)
         Resolve(*stmt.mValue);
 }
@@ -115,16 +124,14 @@ void Resolver::Visit(const Unary &expr)
 
 void Resolver::Visit(const Variable &expr)
 {
-    if (!mScopes.empty() && mScopes.front()[expr.mName->Lexeme()] == false)
-        Lox::Error(*expr.mName, "Can't read local variable in its own initializer.");
+    if (!mScopes.empty())
+    {
+        auto &topScope = mScopes.front();
+        if (topScope.contains(expr.mName->Lexeme()) && topScope[expr.mName->Lexeme()] == false)
+            Lox::Error(*expr.mName, "Can't read local variable in its own initializer.");
+    }
 
     ResolveLocal(expr, *expr.mName);
-}
-
-void Resolver::Resolve(const vector<shared_ptr<Stmt>> statements)
-{
-    for (auto stmt : statements)
-        Resolve(*stmt);
 }
 
 void Resolver::Resolve(const Stmt &stmt)
@@ -151,7 +158,11 @@ void Resolver::Declare(const Token &name)
 {
     if (mScopes.empty())
         return;
-    auto scope = mScopes.front();
+    auto &scope = mScopes.front();
+
+    if (scope.contains(name.Lexeme()))
+        Lox::Error(name, "Already variable with this name in this scope.");
+
     scope[name.Lexeme()] = false;
 }
 
@@ -166,7 +177,7 @@ void Resolver::ResolveLocal(const Expr &expr, const Token &name)
 {
     for (size_t i = 0; i < mScopes.size(); i++)
     {
-        if (mScopes.at(0).contains(name.Lexeme()))
+        if (mScopes.at(i).contains(name.Lexeme()))
         {
             mInterpreter.Resolve(expr, i);
             return;
@@ -174,8 +185,11 @@ void Resolver::ResolveLocal(const Expr &expr, const Token &name)
     }
 }
 
-void Resolver::ResolveFunction(const Function &func)
+void Resolver::ResolveFunction(const Function &func, FunctionType type)
 {
+    auto enclosingFunction = mCurrentFunction;
+    mCurrentFunction = type;
+
     BeginScope();
     for (auto param : func.mParams)
     {
@@ -184,6 +198,8 @@ void Resolver::ResolveFunction(const Function &func)
     }
     Resolve(func.mBody);
     EndScope();
+
+    mCurrentFunction = enclosingFunction;
 }
 
 } // namespace cclox

@@ -78,90 +78,106 @@ TEST_F(InterpreterTestFixture, Binary)
 
 TEST_F(InterpreterTestFixture, Print)
 {
-    auto p = GenerateParserFromSource("print 1; print \"jack\"; print true; print nil;");
-    i.Interpret(p->Parse());
+    WithParsedAndResolvedStmts(i, "print 1; print \"jack\"; print true; print nil;",
+                               [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+                                   i.Interpret(stmts);
 
-    ASSERT_EQ("1\njack\ntrue\nnil\n", testOs.str());
+                                   ASSERT_EQ("1\njack\ntrue\nnil\n", testOs.str());
+                               });
 }
 
 TEST_F(InterpreterTestFixture, Var)
 {
-    auto p = GenerateParserFromSource("var a; var b = 10; var s = \"hi\";");
-    i.Interpret(p->Parse());
+    WithParsedAndResolvedStmts(i, "var a; var b = 10; var s = \"hi\";",
+                               [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+                                   i.Interpret(stmts);
 
-    ASSERT_FALSE(iEnv.Get(token("a")));
-    ASSERT_EQ(10, iEnv.Get(token("b"))->AsNumber());
-    ASSERT_EQ("hi", iEnv.Get(token("s"))->AsString());
+                                   ASSERT_FALSE(iEnv.Get(token("a")));
+                                   ASSERT_EQ(10, iEnv.Get(token("b"))->AsNumber());
+                                   ASSERT_EQ("hi", iEnv.Get(token("s"))->AsString());
+                               });
 }
 
 TEST_F(InterpreterTestFixture, Assign)
 {
-    auto p = GenerateParserFromSource("var a; var b; var c; a = 2; b = c = 3;");
-    i.Interpret(p->Parse());
+    WithParsedAndResolvedStmts(i, "var a; var b; var c; a = 2; b = c = 3;",
+                               [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+                                   i.Interpret(stmts);
 
-    ASSERT_EQ(2, iEnv.Get(token("a"))->AsNumber());
-    ASSERT_EQ(3, iEnv.Get(token("b"))->AsNumber());
-    ASSERT_EQ(3, iEnv.Get(token("c"))->AsNumber());
+                                   ASSERT_EQ(2, iEnv.Get(token("a"))->AsNumber());
+                                   ASSERT_EQ(3, iEnv.Get(token("b"))->AsNumber());
+                                   ASSERT_EQ(3, iEnv.Get(token("c"))->AsNumber());
+                               });
 }
 
 TEST_F(InterpreterTestFixture, Block)
 {
     stringstream ss;
-    ss << "var a = 1; var b = 2; print a; print b; ";
+    ss << "var a = 1; var b = 2; print a; print b; " << endl;
     ss << "{ var a = 9; print a; print b; } ";
-    ss << "print a; print b; ";
-    auto p = GenerateParserFromSource(ss.str());
-    i.Interpret(p->Parse());
+    ss << "print a; print b; " << endl;
 
-    ASSERT_EQ("1\n2\n9\n2\n1\n2\n", testOs.str());
+    WithParsedAndResolvedStmts(i, ss.str(), [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+        i.Interpret(stmts);
+
+        ASSERT_EQ("1\n2\n9\n2\n1\n2\n", testOs.str());
+    });
 }
 
 TEST_F(InterpreterTestFixture, If)
 {
     stringstream ss;
-    ss << "if (true) print 1; ";
-    ss << "if (false) print 2; ";
-    ss << "if (true) print 3; else print 4; ";
-    ss << "if (false) print 3; else print 4; ";
-    ss << "if (false) print 5; else if (false) print 6; else print 7; ";
-    auto p = GenerateParserFromSource(ss.str());
-    i.Interpret(p->Parse());
+    ss << "if (true) print 1; " << endl;
+    ss << "if (false) print 2; " << endl;
+    ss << "if (true) print 3; else print 4; " << endl;
+    ss << "if (false) print 3; else print 4; " << endl;
+    ss << "if (false) print 5; else if (false) print 6; else print 7; " << endl;
 
-    ASSERT_EQ("1\n3\n4\n7\n", testOs.str());
+    WithParsedAndResolvedStmts(i, ss.str(), [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+        i.Interpret(stmts);
+
+        ASSERT_EQ("1\n3\n4\n7\n", testOs.str());
+    });
 }
 
 TEST_F(InterpreterTestFixture, Logical)
 {
     stringstream ss;
-    ss << "print false or 1; ";
-    ss << "print nil or 2; ";
-    ss << "print true or 3; ";
-    ss << "print 0 or 4; ";
-    ss << "print \"s\" or 5; ";
-    auto p = GenerateParserFromSource(ss.str());
-    i.Interpret(p->Parse());
+    ss << "print false or 1; " << endl;
+    ss << "print nil or 2; " << endl;
+    ss << "print true or 3; " << endl;
+    ss << "print 0 or 4; " << endl;
+    ss << "print \"s\" or 5; " << endl;
 
-    ASSERT_EQ("1\n2\ntrue\n0\ns\n", testOs.str());
+    WithParsedAndResolvedStmts(i, ss.str(), [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+        i.Interpret(stmts);
+
+        ASSERT_EQ("1\n2\ntrue\n0\ns\n", testOs.str());
+    });
 }
 
 TEST_F(InterpreterTestFixture, While)
 {
     stringstream ss;
-    ss << "var c = 0; while (c < 3) print c = c + 1;";
-    ss << "var a = 0; while (a < 3) { print a; a = a + 1; }";
-    auto p = GenerateParserFromSource(ss.str());
-    i.Interpret(p->Parse());
+    ss << "var c = 0; while (c < 3) print c = c + 1;" << endl;
+    ss << "var a = 0; while (a < 3) { print a; a = a + 1; }" << endl;
 
-    ASSERT_EQ("1\n2\n3\n0\n1\n2\n", testOs.str());
+    WithParsedAndResolvedStmts(i, ss.str(), [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+        i.Interpret(stmts);
+
+        ASSERT_EQ("1\n2\n3\n0\n1\n2\n", testOs.str());
+    });
 }
 
 TEST_F(InterpreterTestFixture, For)
 {
     stringstream ss;
-    ss << "for (var c = 0; c < 3;) print c = c + 1;";
-    ss << "for (var a = 0; a < 3; a = a + 1) { print a; }";
-    auto p = GenerateParserFromSource(ss.str());
-    i.Interpret(p->Parse());
+    ss << "for (var c = 0; c < 3;) print c = c + 1;" << endl;
+    ss << "for (var a = 0; a < 3; a = a + 1) { print a; }" << endl;
 
-    ASSERT_EQ("1\n2\n3\n0\n1\n2\n", testOs.str());
+    WithParsedAndResolvedStmts(i, ss.str(), [=, this](const vector<shared_ptr<Stmt>> &stmts) {
+        i.Interpret(stmts);
+
+        ASSERT_EQ("1\n2\n3\n0\n1\n2\n", testOs.str());
+    });
 }

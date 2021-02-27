@@ -1,6 +1,12 @@
 #include "Environment.h"
 #include "Interpreter.h"
 
+#define ANCESTOR_IMPL                                                                                                  \
+    auto environment = shared_from_this();                                                                             \
+    for (int i = 0; i < distance; i++)                                                                                 \
+        environment = environment->mEnclosing;                                                                         \
+    return environment;
+
 namespace cclox
 {
 
@@ -23,7 +29,12 @@ void Environment::Assign(const shared_ptr<Token> &name, const shared_ptr<Value> 
         return;
     }
 
-    throw RuntimeError(name, "Undefined variable '" + name->Lexeme() + "'.");
+    throw RuntimeError(name, "Undefined variable a'" + name->Lexeme() + "'.");
+}
+
+void Environment::AssignAt(int distance, const shared_ptr<Token> &name, const shared_ptr<Value> &value)
+{
+    Ancestor(distance)->mValues[name->Lexeme()] = value;
 }
 
 shared_ptr<Value> Environment::Get(const shared_ptr<Token> &name) const
@@ -34,7 +45,19 @@ shared_ptr<Value> Environment::Get(const shared_ptr<Token> &name) const
     if (mEnclosing)
         return mEnclosing->Get(name);
 
-    throw RuntimeError(name, "Undefined variable '" + name->Lexeme() + "'.");
+    throw RuntimeError(name, "Undefined variable aaa'" + name->Lexeme() + "'.");
+}
+
+shared_ptr<Value> Environment::GetAt(int distance, const string &name) const
+{
+    return Ancestor(distance)->mValues.at(name);
+}
+
+shared_ptr<Environment> Environment::Ancestor(int distance){ANCESTOR_IMPL}
+
+shared_ptr<const Environment> Environment::Ancestor(int distance) const
+{
+    ANCESTOR_IMPL
 }
 
 } // namespace cclox

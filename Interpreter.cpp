@@ -5,6 +5,7 @@
 namespace cclox
 {
 
+using std::addressof;
 using std::make_shared;
 
 Interpreter::Interpreter() : Interpreter(std::cout)
@@ -86,7 +87,12 @@ void Interpreter::Visit(const Return &stmt)
 shared_ptr<Value> Interpreter::Visit(const Assign &expr)
 {
     auto value = Evaluate(*expr.mValue);
-    mEnvironment->Assign(expr.mName, value);
+
+    if (mLocals.contains(addressof(expr)))
+        mEnvironment->AssignAt(mLocals.at(addressof(expr)), expr.mName, value);
+    else
+        mGlobals->Assign(expr.mName, value);
+
     return value;
 }
 
@@ -228,12 +234,12 @@ shared_ptr<Value> Interpreter::Visit(const Unary &expr)
 
 shared_ptr<Value> Interpreter::Visit(const Variable &expr)
 {
-    return mEnvironment->Get(expr.mName);
+    return LookUpVariable(expr.mName, expr);
 }
 
 void Interpreter::Resolve(const Expr &expr, int depth)
 {
-    // TODO
+    mLocals[addressof(expr)] = depth;
 }
 
 void Interpreter::Execute(const Stmt &stmt)
@@ -296,6 +302,13 @@ void Interpreter::CheckNumberOperands(const shared_ptr<Token> op, const shared_p
     if (left->IsNumber() && right->IsNumber())
         return;
     throw RuntimeError(op, "Operands must be numbers.");
+}
+
+shared_ptr<Value> Interpreter::LookUpVariable(const shared_ptr<Token> &name, const Expr &expr) const
+{
+    if (mLocals.contains(addressof(expr)))
+        return mEnvironment->GetAt(mLocals.at(addressof(expr)), name->Lexeme());
+    return mGlobals->Get(name);
 }
 
 shared_ptr<Value> Interpreter::InterpretObject(const Object &object) const
