@@ -43,8 +43,9 @@ class Parser
 
     /* public scope for test */
     shared_ptr<Stmt> ParseDeclaration();
-    shared_ptr<Stmt> ParseVarDeclaration();
+    shared_ptr<Stmt> ParseClassDeclaration();
     shared_ptr<Stmt> ParseFunction(const string &kind);
+    shared_ptr<Stmt> ParseVarDeclaration();
 
     shared_ptr<Stmt> ParseStatement();
     shared_ptr<Stmt> ParsePrintStatement();

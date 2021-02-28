@@ -41,3 +41,10 @@ TEST_F(IntegrationTestFixture, function)
 
     AssertOutput("9\n1\n2\n6\n7\n", "function/local_function_and_closures.lox");
 }
+
+TEST_F(IntegrationTestFixture, class)
+{
+    AssertOutput("Car\nCar instance\nCrunch!\n", "class/basic.lox");
+
+    AssertOutput("The mint cake is delicious!\nThing instance\n", "class/this.lox");
+}

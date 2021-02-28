@@ -29,7 +29,7 @@ void Environment::Assign(const shared_ptr<Token> &name, const shared_ptr<Value> 
         return;
     }
 
-    throw RuntimeError(name, "Undefined variable a'" + name->Lexeme() + "'.");
+    throw RuntimeError(*name, "Undefined variable '" + name->Lexeme() + "'.");
 }
 
 void Environment::AssignAt(int distance, const shared_ptr<Token> &name, const shared_ptr<Value> &value)
@@ -45,7 +45,7 @@ shared_ptr<Value> Environment::Get(const shared_ptr<Token> &name) const
     if (mEnclosing)
         return mEnclosing->Get(name);
 
-    throw RuntimeError(name, "Undefined variable aaa'" + name->Lexeme() + "'.");
+    throw RuntimeError(*name, "Undefined variable '" + name->Lexeme() + "'.");
 }
 
 shared_ptr<Value> Environment::GetAt(int distance, const string &name) const

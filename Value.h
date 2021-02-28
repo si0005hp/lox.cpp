@@ -13,7 +13,10 @@ using std::exception;
 using std::shared_ptr;
 using std::string;
 
+class LoxCallable;
 class LoxFunction;
+class LoxClass;
+class LoxInstance;
 
 class UnsupposedValueOperationError : public exception
 {
@@ -43,9 +46,21 @@ class Value
     {
         UNSUPPOSED_OPERATION_ERROR("AsBoolean")
     }
-    virtual const LoxFunction &AsFunction() const
+    virtual LoxCallable *AsCallable()
+    {
+        UNSUPPOSED_OPERATION_ERROR("AsCallable")
+    }
+    virtual LoxFunction &AsFunction()
     {
         UNSUPPOSED_OPERATION_ERROR("AsFunction")
+    }
+    virtual LoxClass &AsClass()
+    {
+        UNSUPPOSED_OPERATION_ERROR("AsClass")
+    }
+    virtual LoxInstance &AsInstance()
+    {
+        UNSUPPOSED_OPERATION_ERROR("AsInstance")
     }
 
     virtual const bool IsString() const
@@ -60,7 +75,19 @@ class Value
     {
         return false;
     }
+    virtual const bool IsCallable() const
+    {
+        return false;
+    }
     virtual const bool IsFunction() const
+    {
+        return false;
+    }
+    virtual const bool IsClass() const
+    {
+        return false;
+    }
+    virtual const bool IsInstance() const
     {
         return false;
     }

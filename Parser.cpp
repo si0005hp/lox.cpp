@@ -25,6 +25,8 @@ shared_ptr<Stmt> Parser::ParseDeclaration()
 {
     try
     {
+        if (Match(TOKEN_CLASS))
+            return ParseClassDeclaration();
         if (Match(TOKEN_FUN))
             return ParseFunction("function");
         if (Match(TOKEN_VAR))
@@ -36,6 +38,21 @@ shared_ptr<Stmt> Parser::ParseDeclaration()
         Synchronize();
         return nullptr;
     }
+}
+
+// classDecl      → "class" IDENTIFIER ( "<" IDENTIFIER )?
+//                  "{" function* "}" ;
+shared_ptr<Stmt> Parser::ParseClassDeclaration()
+{
+    auto name = Consume(TOKEN_IDENTIFIER, "Expect class name.");
+    Consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
+
+    vector<shared_ptr<Function>> methods;
+    while (!Check(TOKEN_RIGHT_BRACE) && !IsAtEnd())
+        methods.push_back(static_pointer_cast<Function>(ParseFunction("method")));
+
+    Consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
+    return make_shared<Class>(name, methods);
 }
 
 // funDecl        → "fun" function ;
@@ -205,7 +222,7 @@ shared_ptr<Expr> Parser::ParseExpression()
     return ParseAssignment();
 }
 
-// assignment     → IDENTIFIER "=" assignment
+// assignment     → ( call "." )? IDENTIFIER "=" assignment
 //                | logic_or ;
 shared_ptr<Expr> Parser::ParseAssignment()
 {
@@ -219,6 +236,11 @@ shared_ptr<Expr> Parser::ParseAssignment()
         {
             auto name = static_pointer_cast<Variable>(expr)->mName;
             return make_shared<Assign>(name, value);
+        }
+        else if (typeid(*expr) == typeid(Get))
+        {
+            auto get = static_pointer_cast<Get>(expr);
+            return make_shared<Set>(get->mObject, get->mName, value);
         }
         Error(*equals, "Invalid assignment target.");
     }
@@ -325,8 +347,7 @@ shared_ptr<Expr> Parser::ParseUnary()
     return ParseCall();
 }
 
-// call           → primary ( "(" arguments? ")" )* ;
-// arguments      → expression ( "," expression )* ;
+// call           → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 shared_ptr<Expr> Parser::ParseCall()
 {
     auto expr = ParsePrimary();
@@ -334,6 +355,11 @@ shared_ptr<Expr> Parser::ParseCall()
     while (true)
         if (Match(TOKEN_LEFT_PAREN))
             expr = FinishCall(expr);
+        else if (Match(TOKEN_DOT))
+        {
+            auto name = Consume(TOKEN_IDENTIFIER, "Expect property name after '.'.");
+            expr = make_shared<Get>(expr, name);
+        }
         else
             break;
 
@@ -375,6 +401,9 @@ shared_ptr<Expr> Parser::ParsePrimary()
 
     if (Match(TOKEN_IDENTIFIER))
         return make_shared<Variable>(Previous());
+
+    if (Match(TOKEN_THIS))
+        return make_shared<This>(Previous());
 
     if (Match(TOKEN_LEFT_PAREN))
     {

@@ -1,5 +1,6 @@
 #include "LoxFunction.h"
 #include "Interpreter.h"
+#include "LoxClass.h"
 
 namespace cclox
 {
@@ -26,6 +27,13 @@ shared_ptr<Value> LoxFunction::Call(Interpreter &interpreter, const vector<share
 size_t LoxFunction::Arity() const
 {
     return mDeclaration.mParams.size();
+}
+
+shared_ptr<LoxFunction> LoxFunction::Bind(const shared_ptr<LoxInstance> &instance)
+{
+    auto environment = make_shared<Environment>(mClosure);
+    environment->Define("this", instance);
+    return make_shared<LoxFunction>(mDeclaration, environment);
 }
 
 } // namespace cclox

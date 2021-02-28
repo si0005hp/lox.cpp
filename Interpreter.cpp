@@ -1,5 +1,6 @@
 #include "Interpreter.h"
 #include "Lox.h"
+#include "LoxClass.h"
 #include "LoxFunction.h"
 
 namespace cclox
@@ -84,6 +85,21 @@ void Interpreter::Visit(const Return &stmt)
     throw FunctionReturn(value);
 }
 
+void Interpreter::Visit(const Class &stmt)
+{
+    mEnvironment->Define(stmt.mName->Lexeme(), nullptr);
+
+    unordered_map<string, shared_ptr<LoxFunction>> methods;
+    for (auto method : stmt.mMethods)
+    {
+        auto function = make_shared<LoxFunction>(*method, mEnvironment);
+        methods[method->mName->Lexeme()] = function;
+    }
+
+    auto klass = make_shared<LoxClass>(stmt.mName->Lexeme(), std::move(methods));
+    mEnvironment->Assign(stmt.mName, klass);
+}
+
 shared_ptr<Value> Interpreter::Visit(const Assign &expr)
 {
     auto value = Evaluate(*expr.mValue);
@@ -134,7 +150,7 @@ shared_ptr<Value> Interpreter::Visit(const Binary &expr)
         {
             return LoxValue<StringValue>(left->AsString() + right->AsString());
         }
-        throw RuntimeError(expr.mOp, "Operands must be two numbers or two strings.");
+        throw RuntimeError(*expr.mOp, "Operands must be two numbers or two strings.");
     case TOKEN_SLASH:
         CheckNumberOperands(expr.mOp, left, right);
         return LoxValue<NumberValue>(left->AsNumber() / right->AsNumber());
@@ -155,21 +171,25 @@ shared_ptr<Value> Interpreter::Visit(const Call &expr)
     for (auto argument : expr.mArguments)
         arguments.push_back(Evaluate(*argument));
 
-    if (!callee->IsFunction())
-        throw RuntimeError(expr.mParen, "Can only call functions and classes.");
+    if (!callee->IsCallable())
+        throw RuntimeError(*expr.mParen, "Can only call functions and classes.");
 
-    auto function = callee->AsFunction();
+    auto callable = callee->AsCallable();
 
-    if (arguments.size() != function.Arity())
-        throw RuntimeError(expr.mParen, "Expected " + to_string(function.Arity()) + " arguments but got " +
-                                            to_string(arguments.size()) + ".");
+    if (arguments.size() != callable->Arity())
+        throw RuntimeError(*expr.mParen, "Expected " + to_string(callable->Arity()) + " arguments but got " +
+                                             to_string(arguments.size()) + ".");
 
-    return function.Call(*this, arguments);
+    return callable->Call(*this, arguments);
 }
 
 shared_ptr<Value> Interpreter::Visit(const Get &expr)
 {
-    return nullptr;
+    auto object = Evaluate(*expr.mObject);
+    if (object->IsInstance())
+        return object->AsInstance().Get(*expr.mName);
+
+    throw RuntimeError(*expr.mName, "Only instances have properties.");
 }
 
 shared_ptr<Value> Interpreter::Visit(const Grouping &expr)
@@ -202,7 +222,14 @@ shared_ptr<Value> Interpreter::Visit(const Logical &expr)
 
 shared_ptr<Value> Interpreter::Visit(const Set &expr)
 {
-    return nullptr;
+    auto object = Evaluate(*expr.mObject);
+
+    if (!object->IsInstance())
+        throw RuntimeError(*expr.mName, "Only instances have fields.");
+
+    auto value = Evaluate(*expr.mValue);
+    object->AsInstance().Set(*expr.mName, value);
+    return value;
 }
 
 shared_ptr<Value> Interpreter::Visit(const Super &expr)
@@ -212,7 +239,7 @@ shared_ptr<Value> Interpreter::Visit(const Super &expr)
 
 shared_ptr<Value> Interpreter::Visit(const This &expr)
 {
-    return nullptr;
+    return LookUpVariable(expr.mKeyword, expr);
 }
 
 shared_ptr<Value> Interpreter::Visit(const Unary &expr)
@@ -293,7 +320,7 @@ void Interpreter::CheckNumberOperand(const shared_ptr<Token> op, const shared_pt
 {
     if (operand->IsNumber())
         return;
-    throw RuntimeError(op, "Operand must be a number.");
+    throw RuntimeError(*op, "Operand must be a number.");
 }
 
 void Interpreter::CheckNumberOperands(const shared_ptr<Token> op, const shared_ptr<Value> &left,
@@ -301,7 +328,7 @@ void Interpreter::CheckNumberOperands(const shared_ptr<Token> op, const shared_p
 {
     if (left->IsNumber() && right->IsNumber())
         return;
-    throw RuntimeError(op, "Operands must be numbers.");
+    throw RuntimeError(*op, "Operands must be numbers.");
 }
 
 shared_ptr<Value> Interpreter::LookUpVariable(const shared_ptr<Token> &name, const Expr &expr) const

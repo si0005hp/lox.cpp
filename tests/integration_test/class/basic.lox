@@ -1,0 +1,15 @@
+class Car {
+}
+print Car;
+
+
+var tesla = Car();
+print tesla;
+
+
+class Bacon {
+  eat() {
+    print "Crunch!";
+  }
+}
+Bacon().eat();

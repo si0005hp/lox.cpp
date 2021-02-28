@@ -66,6 +66,25 @@ void Resolver::Visit(const Return &stmt)
         Resolve(*stmt.mValue);
 }
 
+void Resolver::Visit(const Class &stmt)
+{
+    auto enclosingClass = mCurrentClass;
+    mCurrentClass = CLASS_CLASS;
+
+    Declare(*stmt.mName);
+    Define(*stmt.mName);
+
+    BeginScope();
+    mScopes.front()["this"] = true;
+
+    for (auto method : stmt.mMethods)
+        ResolveFunction(*method, FUNCTION_METHOD);
+
+    EndScope();
+
+    mCurrentClass = enclosingClass;
+}
+
 void Resolver::Visit(const Assign &expr)
 {
     Resolve(*expr.mValue);
@@ -87,6 +106,7 @@ void Resolver::Visit(const Call &expr)
 
 void Resolver::Visit(const Get &expr)
 {
+    Resolve(*expr.mObject);
 }
 
 void Resolver::Visit(const Grouping &expr)
@@ -107,6 +127,8 @@ void Resolver::Visit(const Logical &expr)
 
 void Resolver::Visit(const Set &expr)
 {
+    Resolve(*expr.mValue);
+    Resolve(*expr.mObject);
 }
 
 void Resolver::Visit(const Super &expr)
@@ -115,6 +137,13 @@ void Resolver::Visit(const Super &expr)
 
 void Resolver::Visit(const This &expr)
 {
+    if (mCurrentClass == CLASS_NONE)
+    {
+        Lox::Error(*expr.mKeyword, "Can't use 'this' outside of a class.");
+        return;
+    }
+
+    ResolveLocal(expr, *expr.mKeyword);
 }
 
 void Resolver::Visit(const Unary &expr)

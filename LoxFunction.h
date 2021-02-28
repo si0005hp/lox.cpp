@@ -14,7 +14,7 @@ struct FunctionReturn : public exception
     const shared_ptr<Value> mValue;
 };
 
-class LoxFunction : public LoxCallable, public Value
+class LoxFunction : public LoxCallable
 {
   public:
     LoxFunction(const Function &declaration, const shared_ptr<Environment> &closure)
@@ -25,11 +25,13 @@ class LoxFunction : public LoxCallable, public Value
     size_t Arity() const;
     shared_ptr<Value> Call(Interpreter &interpreter, const vector<shared_ptr<Value>> &arguments);
 
-    const LoxFunction &AsFunction() const override
+    shared_ptr<LoxFunction> Bind(const shared_ptr<LoxInstance> &instance);
+
+    /* Value */
+    LoxFunction &AsFunction() override
     {
         return *this;
     }
-
     virtual const bool IsFunction() const override
     {
         return true;
@@ -46,7 +48,7 @@ class LoxFunction : public LoxCallable, public Value
     }
 
   private:
-    Function mDeclaration;
+    Function mDeclaration; // TODO
     shared_ptr<Environment> mClosure;
 };
 

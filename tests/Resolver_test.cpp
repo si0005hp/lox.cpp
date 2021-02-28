@@ -42,9 +42,20 @@ TEST_F(ResolverTestFixture, SelfReference)
     Lox::ResetError();
 }
 
-TEST_F(ResolverTestFixture, TopLevelReturn)
+TEST_F(ResolverTestFixture, InvalidReturn)
 {
     ParseAndResolve(i, "return 1;");
+    ASSERT_TRUE(Lox::HadError());
+    Lox::ResetError();
+}
+
+TEST_F(ResolverTestFixture, InvalidThis)
+{
+    ParseAndResolve(i, "print this;");
+    ASSERT_TRUE(Lox::HadError());
+    Lox::ResetError();
+
+    ParseAndResolve(i, "fun notAMethod() { print this; }");
     ASSERT_TRUE(Lox::HadError());
     Lox::ResetError();
 }

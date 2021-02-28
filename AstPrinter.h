@@ -91,6 +91,17 @@ class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
             return "(return)";
         return Parenthesize("return", vector<shared_ptr<Expr>>{stmt.mValue});
     }
+    virtual string Visit(const Class &stmt) override
+    {
+        stringstream ss;
+        ss << "(class" << stmt.mName->Lexeme();
+
+        for (auto method : stmt.mMethods)
+            ss << " " << Ast(*method);
+
+        ss << ")";
+        return ss.str();
+    }
 
     virtual string Visit(const Assign &expr) override
     {

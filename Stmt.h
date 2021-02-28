@@ -27,6 +27,7 @@ using std::shared_ptr;
 using std::vector;
 
 class Block;
+class Class;
 class Expression;
 class Function;
 class If;
@@ -42,6 +43,7 @@ class Stmt
     {
       public:
         virtual R Visit(const Block &stmt) = 0;
+        virtual R Visit(const Class &stmt) = 0;
         virtual R Visit(const Expression &stmt) = 0;
         virtual R Visit(const Function &stmt) = 0;
         virtual R Visit(const If &stmt) = 0;
@@ -62,6 +64,19 @@ class Block : public Stmt
     }
 
     vector<shared_ptr<Stmt>> mStatements;
+
+    STMT_ACCEPT_METHODS
+};
+
+class Class : public Stmt
+{
+  public:
+    Class(const shared_ptr<Token> &name, const vector<shared_ptr<Function>> &methods) : mName(name), mMethods(methods)
+    {
+    }
+
+    shared_ptr<Token> mName;
+    vector<shared_ptr<Function>> mMethods;
 
     STMT_ACCEPT_METHODS
 };

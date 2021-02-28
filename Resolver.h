@@ -17,6 +17,14 @@ enum FunctionType
 {
     FUNCTION_NONE,
     FUNCTION_FUNCTION,
+    FUNCTION_METHOD,
+};
+
+enum ClassType
+{
+    CLASS_NONE,
+    CLASS_CLASS,
+    CLASS_SUBCLASS,
 };
 
 class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
@@ -36,6 +44,7 @@ class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
     void Visit(const While &stmt);
     void Visit(const Function &stmt);
     void Visit(const Return &stmt);
+    void Visit(const Class &stmt);
 
     void Visit(const Assign &expr);
     void Visit(const Binary &expr);
@@ -64,6 +73,7 @@ class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
     deque<unordered_map<string, bool>> mScopes;
 
     FunctionType mCurrentFunction = FUNCTION_NONE;
+    ClassType mCurrentClass = CLASS_NONE;
 };
 
 } // namespace cclox

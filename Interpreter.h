@@ -19,7 +19,7 @@ using std::unordered_map;
 class RuntimeError : public exception
 {
   public:
-    RuntimeError(const shared_ptr<Token> token, const string &msg) : mToken(token), mMsg(msg)
+    RuntimeError(const Token &token, const string &msg) : mToken(token), mMsg(msg)
     {
     }
     virtual const char *what() const throw()
@@ -27,7 +27,7 @@ class RuntimeError : public exception
         return mMsg.c_str();
     }
 
-    const shared_ptr<Token> mToken;
+    const Token &mToken;
     const string mMsg;
 };
 
@@ -49,6 +49,7 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     void Visit(const While &stmt);
     void Visit(const Function &stmt);
     void Visit(const Return &stmt);
+    void Visit(const Class &stmt);
 
     shared_ptr<Value> Visit(const Assign &expr);
     shared_ptr<Value> Visit(const Binary &expr);
