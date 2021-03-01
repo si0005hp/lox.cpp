@@ -63,7 +63,12 @@ void Resolver::Visit(const Return &stmt)
         Lox::Error(*stmt.mKeyword, "Can't return from top-level code.");
 
     if (stmt.mValue)
+    {
+        if (mCurrentFunction == FUNCTION_INITIALIZER)
+            Lox::Error(*stmt.mKeyword, "Can't return a value from an initializer.");
+
         Resolve(*stmt.mValue);
+    }
 }
 
 void Resolver::Visit(const Class &stmt)
@@ -78,7 +83,7 @@ void Resolver::Visit(const Class &stmt)
     mScopes.front()["this"] = true;
 
     for (auto method : stmt.mMethods)
-        ResolveFunction(*method, FUNCTION_METHOD);
+        ResolveFunction(*method, method->mName->Lexeme() == "init" ? FUNCTION_INITIALIZER : FUNCTION_METHOD);
 
     EndScope();
 

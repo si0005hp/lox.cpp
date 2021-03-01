@@ -17,8 +17,8 @@ struct FunctionReturn : public exception
 class LoxFunction : public LoxCallable
 {
   public:
-    LoxFunction(const Function &declaration, const shared_ptr<Environment> &closure)
-        : mDeclaration(declaration), mClosure(closure)
+    LoxFunction(const Function &declaration, const shared_ptr<Environment> &closure, const bool isInitializer)
+        : mDeclaration(declaration), mClosure(closure), mIsInitializer(isInitializer)
     {
     }
 
@@ -50,6 +50,7 @@ class LoxFunction : public LoxCallable
   private:
     Function mDeclaration; // TODO
     shared_ptr<Environment> mClosure;
+    const bool mIsInitializer;
 };
 
 } // namespace cclox

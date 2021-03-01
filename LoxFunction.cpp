@@ -1,4 +1,5 @@
 #include "LoxFunction.h"
+
 #include "Interpreter.h"
 #include "LoxClass.h"
 
@@ -19,9 +20,10 @@ shared_ptr<Value> LoxFunction::Call(Interpreter &interpreter, const vector<share
     }
     catch (const FunctionReturn &returnValue)
     {
-        return returnValue.mValue;
+        return mIsInitializer ? mClosure->GetAt(0, "this") : returnValue.mValue;
     }
-    return nullptr;
+
+    return mIsInitializer ? mClosure->GetAt(0, "this") : nullptr;
 }
 
 size_t LoxFunction::Arity() const
@@ -33,7 +35,7 @@ shared_ptr<LoxFunction> LoxFunction::Bind(const shared_ptr<LoxInstance> &instanc
 {
     auto environment = make_shared<Environment>(mClosure);
     environment->Define("this", instance);
-    return make_shared<LoxFunction>(mDeclaration, environment);
+    return make_shared<LoxFunction>(mDeclaration, environment, mIsInitializer);
 }
 
 } // namespace cclox

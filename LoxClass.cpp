@@ -1,4 +1,5 @@
 #include "LoxClass.h"
+
 #include "Interpreter.h"
 
 namespace cclox
@@ -7,11 +8,19 @@ namespace cclox
 shared_ptr<Value> LoxClass::Call(Interpreter &interpreter, const vector<shared_ptr<Value>> &arguments)
 {
     auto instance = make_shared<LoxInstance>(*this);
+
+    auto initializer = FindMethod("init");
+    if (initializer)
+        initializer->Bind(instance)->Call(interpreter, arguments);
+
     return instance;
 }
 
 size_t LoxClass::Arity() const
 {
+    auto initializer = FindMethod("init");
+    if (initializer)
+        return initializer->Arity();
     return 0;
 }
 

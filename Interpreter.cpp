@@ -74,7 +74,7 @@ void Interpreter::Visit(const While &stmt)
 
 void Interpreter::Visit(const Function &stmt)
 {
-    auto function = make_shared<LoxFunction>(stmt, mEnvironment);
+    auto function = make_shared<LoxFunction>(stmt, mEnvironment, false);
     mEnvironment->Define(stmt.mName->Lexeme(), function);
 }
 
@@ -92,7 +92,7 @@ void Interpreter::Visit(const Class &stmt)
     unordered_map<string, shared_ptr<LoxFunction>> methods;
     for (auto method : stmt.mMethods)
     {
-        auto function = make_shared<LoxFunction>(*method, mEnvironment);
+        auto function = make_shared<LoxFunction>(*method, mEnvironment, method->mName->Lexeme() == "init");
         methods[method->mName->Lexeme()] = function;
     }
 

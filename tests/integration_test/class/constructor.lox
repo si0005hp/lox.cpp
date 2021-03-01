@@ -1,0 +1,30 @@
+class Foo {
+  init(a, b) {
+    print "initializing";
+    this.a = a;
+    this.b = b;
+  }
+}
+var foo = Foo(1, 2);
+print foo.a;
+print foo.b;
+
+
+class Bar {
+  init() {
+    print "b ";
+  }
+}
+var b = Bar();
+print b.init();
+
+
+class Hoge {
+  init() {
+    print "hoge";
+    return;
+    print "fuga";
+  }
+}
+var h = Hoge();
+print h.init();

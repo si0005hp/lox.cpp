@@ -17,6 +17,7 @@ enum FunctionType
 {
     FUNCTION_NONE,
     FUNCTION_FUNCTION,
+    FUNCTION_INITIALIZER,
     FUNCTION_METHOD,
 };
 
