@@ -49,4 +49,6 @@ TEST_F(IntegrationTestFixture, class)
     AssertOutput("The mint cake is delicious!\nThing instance\n", "class/this.lox");
 
     AssertOutput("initializing\n1\n2\nb \nb \nBar instance\nhoge\nhoge\nHoge instance\n", "class/constructor.lox");
+
+    AssertOutput("Fry.\nFry.\nPipe.\nA method\n", "class/inheritance.lox");
 }

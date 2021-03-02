@@ -32,6 +32,11 @@ class Environment : public enable_shared_from_this<Environment>
     shared_ptr<Environment> Ancestor(int distance);
     shared_ptr<const Environment> Ancestor(int distance) const;
 
+    const shared_ptr<Environment> &GetEnclosing() const
+    {
+        return mEnclosing;
+    }
+
   private:
     shared_ptr<Environment> mEnclosing;
 

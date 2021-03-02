@@ -45,6 +45,14 @@ shared_ptr<Stmt> Parser::ParseDeclaration()
 shared_ptr<Stmt> Parser::ParseClassDeclaration()
 {
     auto name = Consume(TOKEN_IDENTIFIER, "Expect class name.");
+
+    shared_ptr<Variable> superclass = nullptr;
+    if (Match(TOKEN_LESS))
+    {
+        Consume(TOKEN_IDENTIFIER, "Expect superclass name.");
+        superclass = make_shared<Variable>(Previous());
+    }
+
     Consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
 
     vector<shared_ptr<Function>> methods;
@@ -52,7 +60,7 @@ shared_ptr<Stmt> Parser::ParseClassDeclaration()
         methods.push_back(static_pointer_cast<Function>(ParseFunction("method")));
 
     Consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
-    return make_shared<Class>(name, methods);
+    return make_shared<Class>(name, superclass, methods);
 }
 
 // funDecl        → "fun" function ;
@@ -398,6 +406,14 @@ shared_ptr<Expr> Parser::ParsePrimary()
 
     if (Match(vector<TokenType>{TOKEN_NUMBER, TOKEN_STRING}))
         return make_shared<Literal>(make_shared<Object>(Previous()->Literal()));
+
+    if (Match(TOKEN_SUPER))
+    {
+        auto keyword = Previous();
+        Consume(TOKEN_DOT, "Expect '.' after 'super'.");
+        auto method = Consume(TOKEN_IDENTIFIER, "Expect superclass method name.");
+        return make_shared<Super>(keyword, method);
+    }
 
     if (Match(TOKEN_IDENTIFIER))
         return make_shared<Variable>(Previous());

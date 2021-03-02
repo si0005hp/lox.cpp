@@ -31,7 +31,7 @@ const static map<string, string> stmts = {
     {"While", "shared_ptr<Expr> condition, shared_ptr<Stmt> body"},
     {"Function", "shared_ptr<Token> name, vector<shared_ptr<Token>> params, vector<shared_ptr<Stmt>> body"},
     {"Return", "shared_ptr<Token> keyword, shared_ptr<Expr> value"},
-    {"Class", "shared_ptr<Token> name, vector<shared_ptr<Function>> methods"},
+    {"Class", "shared_ptr<Token> name, shared_ptr<Variable> superclass, vector<shared_ptr<Function>> methods"},
 };
 
 const static vector<string> exprVisitorTypes = {"string", "shared_ptr<Value>", "void"};

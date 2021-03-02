@@ -87,7 +87,21 @@ void Interpreter::Visit(const Return &stmt)
 
 void Interpreter::Visit(const Class &stmt)
 {
+    shared_ptr<Value> superclass = nullptr;
+    if (stmt.mSuperclass)
+    {
+        superclass = Evaluate(*stmt.mSuperclass);
+        if (!superclass->IsClass())
+            throw RuntimeError(*stmt.mSuperclass->mName, "Superclass must be a class.");
+    }
+
     mEnvironment->Define(stmt.mName->Lexeme(), nullptr);
+
+    if (stmt.mSuperclass)
+    {
+        mEnvironment = make_shared<Environment>(mEnvironment);
+        mEnvironment->Define("super", superclass);
+    }
 
     unordered_map<string, shared_ptr<LoxFunction>> methods;
     for (auto method : stmt.mMethods)
@@ -96,7 +110,13 @@ void Interpreter::Visit(const Class &stmt)
         methods[method->mName->Lexeme()] = function;
     }
 
-    auto klass = make_shared<LoxClass>(stmt.mName->Lexeme(), std::move(methods));
+    // TODO superclass
+    auto klass =
+        make_shared<LoxClass>(stmt.mName->Lexeme(), superclass ? &superclass->AsClass() : nullptr, std::move(methods));
+
+    if (superclass)
+        mEnvironment = mEnvironment->GetEnclosing();
+
     mEnvironment->Assign(stmt.mName, klass);
 }
 
@@ -234,7 +254,18 @@ shared_ptr<Value> Interpreter::Visit(const Set &expr)
 
 shared_ptr<Value> Interpreter::Visit(const Super &expr)
 {
-    return nullptr;
+    auto distance = mLocals.at(addressof(expr));
+
+    auto superclass = mEnvironment->GetAt(distance, "super")->AsClass();
+
+    auto object = mEnvironment->GetAt(distance - 1, "this");
+
+    auto method = superclass.FindMethod(expr.mMethod->Lexeme());
+
+    if (!method)
+        throw RuntimeError(*expr.mMethod, "Undefined property '" + expr.mMethod->Lexeme() + "'.");
+
+    return method->AsFunction().Bind(static_pointer_cast<LoxInstance>(object)); // TODO
 }
 
 shared_ptr<Value> Interpreter::Visit(const This &expr)

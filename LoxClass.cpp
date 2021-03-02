@@ -26,7 +26,10 @@ size_t LoxClass::Arity() const
 
 shared_ptr<LoxFunction> LoxClass::FindMethod(const string &name) const
 {
-    return mMethods.contains(name) ? mMethods.at(name) : nullptr;
+    if (mMethods.contains(name))
+        return mMethods.at(name);
+
+    return mSuperclass ? mSuperclass->FindMethod(name) : nullptr;
 }
 
 /* LoxInstance */

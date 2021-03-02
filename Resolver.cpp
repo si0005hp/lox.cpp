@@ -79,6 +79,21 @@ void Resolver::Visit(const Class &stmt)
     Declare(*stmt.mName);
     Define(*stmt.mName);
 
+    if (stmt.mSuperclass && stmt.mName->Lexeme() == stmt.mSuperclass->mName->Lexeme())
+        Lox::Error(*stmt.mSuperclass->mName, "A class can't inherit from itself.");
+
+    if (stmt.mSuperclass)
+    {
+        mCurrentClass = CLASS_SUBCLASS;
+        Resolve(*stmt.mSuperclass);
+    }
+
+    if (stmt.mSuperclass)
+    {
+        BeginScope();
+        mScopes.front()["super"] = true;
+    }
+
     BeginScope();
     mScopes.front()["this"] = true;
 
@@ -86,6 +101,9 @@ void Resolver::Visit(const Class &stmt)
         ResolveFunction(*method, method->mName->Lexeme() == "init" ? FUNCTION_INITIALIZER : FUNCTION_METHOD);
 
     EndScope();
+
+    if (stmt.mSuperclass)
+        EndScope();
 
     mCurrentClass = enclosingClass;
 }
@@ -138,6 +156,12 @@ void Resolver::Visit(const Set &expr)
 
 void Resolver::Visit(const Super &expr)
 {
+    if (mCurrentClass == CLASS_NONE)
+        Lox::Error(*expr.mKeyword, "Can't use 'super' outside of a class.");
+    else if (mCurrentClass != CLASS_SUBCLASS)
+        Lox::Error(*expr.mKeyword, "Can't use 'super' in a class with no superclass.");
+
+    ResolveLocal(expr, *expr.mKeyword);
 }
 
 void Resolver::Visit(const This &expr)

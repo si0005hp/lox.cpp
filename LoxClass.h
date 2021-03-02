@@ -19,8 +19,8 @@ class LoxClass : public LoxCallable
     friend class LoxInstance;
 
   public:
-    LoxClass(const string &name, unordered_map<string, shared_ptr<LoxFunction>> &&methods)
-        : mName(name), mMethods(std::move(methods))
+    LoxClass(const string &name, LoxClass *superclass, unordered_map<string, shared_ptr<LoxFunction>> &&methods)
+        : mName(name), mSuperclass(superclass), mMethods(std::move(methods))
     {
     }
 
@@ -51,6 +51,7 @@ class LoxClass : public LoxCallable
 
   private:
     string mName;
+    LoxClass *mSuperclass;
     unordered_map<string, shared_ptr<LoxFunction>> mMethods;
 };
 

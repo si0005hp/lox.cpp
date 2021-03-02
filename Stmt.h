@@ -71,11 +71,14 @@ class Block : public Stmt
 class Class : public Stmt
 {
   public:
-    Class(const shared_ptr<Token> &name, const vector<shared_ptr<Function>> &methods) : mName(name), mMethods(methods)
+    Class(const shared_ptr<Token> &name, const shared_ptr<Variable> &superclass,
+          const vector<shared_ptr<Function>> &methods)
+        : mName(name), mSuperclass(superclass), mMethods(methods)
     {
     }
 
     shared_ptr<Token> mName;
+    shared_ptr<Variable> mSuperclass;
     vector<shared_ptr<Function>> mMethods;
 
     STMT_ACCEPT_METHODS
