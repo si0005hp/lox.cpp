@@ -6,7 +6,7 @@
 #include <deque>
 #include <unordered_map>
 
-namespace cclox
+namespace lox
 {
 
 using std::deque;
@@ -77,4 +77,4 @@ class Resolver : public Expr::Visitor<void>, public Stmt::Visitor<void>
     ClassType mCurrentClass = CLASS_NONE;
 };
 
-} // namespace cclox
+} // namespace lox

@@ -1,6 +1,6 @@
 #include "Token.h"
 
-namespace cclox
+namespace lox
 {
 
 std::ostream &operator<<(std::ostream &cout, const Token &token)
@@ -150,4 +150,4 @@ std::ostream &operator<<(std::ostream &cout, const Token &token)
     return cout;
 }
 
-} // namespace cclox
+} // namespace lox

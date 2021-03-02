@@ -7,7 +7,7 @@
         environment = environment->mEnclosing;                                                                         \
     return environment;
 
-namespace cclox
+namespace lox
 {
 
 void Environment::Define(const string &name, const shared_ptr<Value> &value)
@@ -60,4 +60,4 @@ shared_ptr<const Environment> Environment::Ancestor(int distance) const
     ANCESTOR_IMPL
 }
 
-} // namespace cclox
+} // namespace lox

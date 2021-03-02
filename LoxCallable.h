@@ -3,7 +3,7 @@
 #include "Stmt.h"
 #include "Value.h"
 
-namespace cclox
+namespace lox
 {
 
 class Interpreter;
@@ -24,4 +24,4 @@ class LoxCallable : public Value
     }
 };
 
-} // namespace cclox
+} // namespace lox

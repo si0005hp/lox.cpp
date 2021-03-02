@@ -5,7 +5,7 @@
 #include "Interpreter.h"
 #include "Token.h"
 
-namespace cclox
+namespace lox
 {
 
 class Lox
@@ -37,4 +37,4 @@ class Lox
     inline static bool sHadError = false;
 };
 
-} // namespace cclox
+} // namespace lox

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <memory>
 
-namespace cclox
+namespace lox
 {
 
 using std::exception;
@@ -95,4 +95,4 @@ class Interpreter : public Expr::Visitor<shared_ptr<Value>>, public Stmt::Visito
     std::ostream &mOs;
 };
 
-} // namespace cclox
+} // namespace lox

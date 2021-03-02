@@ -8,7 +8,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-using namespace cclox;
+using namespace lox;
 using namespace std;
 
 class CcloxTestFixtureBase : public ::testing::Test

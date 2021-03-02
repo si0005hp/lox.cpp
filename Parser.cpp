@@ -1,6 +1,6 @@
 #include "Parser.h"
 
-namespace cclox
+namespace lox
 {
 
 using std::shared_ptr;
@@ -507,4 +507,4 @@ void Parser::Synchronize()
     }
 }
 
-} // namespace cclox
+} // namespace lox

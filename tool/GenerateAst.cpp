@@ -214,7 +214,7 @@ int main(int argc, char const *argv[])
     else
         defineMacro("Expr", exprVisitorTypes);
 
-    cout << "namespace cclox";
+    cout << "namespace lox";
     cout << " { ";
     cout << endl << endl;
     cout << "using std::shared_ptr;";

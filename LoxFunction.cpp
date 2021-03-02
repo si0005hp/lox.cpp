@@ -3,7 +3,7 @@
 #include "Interpreter.h"
 #include "LoxClass.h"
 
-namespace cclox
+namespace lox
 {
 
 shared_ptr<Value> LoxFunction::Call(Interpreter &interpreter, const vector<shared_ptr<Value>> &arguments)
@@ -38,4 +38,4 @@ shared_ptr<LoxFunction> LoxFunction::Bind(const shared_ptr<LoxInstance> &instanc
     return make_shared<LoxFunction>(mDeclaration, environment, mIsInitializer);
 }
 
-} // namespace cclox
+} // namespace lox

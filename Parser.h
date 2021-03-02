@@ -8,7 +8,7 @@
 #include "Stmt.h"
 #include "Token.h"
 
-namespace cclox
+namespace lox
 {
 
 using std::exception;
@@ -86,4 +86,4 @@ class Parser
     int mCurrent = 0;
 };
 
-} // namespace cclox
+} // namespace lox

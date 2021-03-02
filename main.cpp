@@ -4,13 +4,13 @@
 
 #include "Lox.h"
 
-using namespace cclox;
+using namespace lox;
 
 int main(int argc, char const *argv[])
 {
     if (argc == 1)
     {
-        std::cout << "cclox 0.0.0d" << std::endl;
+        std::cout << "lox 0.0.0d" << std::endl;
         std::cout << "------------" << std::endl;
         Lox::RunRepl();
     }

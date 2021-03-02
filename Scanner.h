@@ -6,7 +6,7 @@
 
 #include "Token.h"
 
-namespace cclox
+namespace lox
 {
 
 using std::make_shared;
@@ -55,4 +55,4 @@ class Scanner
     size_t mLine = 1;
 };
 
-} // namespace cclox
+} // namespace lox

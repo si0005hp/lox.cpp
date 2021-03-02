@@ -4,7 +4,7 @@ project(main)
 set(CMAKE_CXX_FLAGS "-g -std=c++2a -Wall")
 
 
-set(cclox_lib_SRC
+set(lox_lib_SRC
   ${PROJECT_SOURCE_DIR}/Lox.cpp
   ${PROJECT_SOURCE_DIR}/Token.cpp
   ${PROJECT_SOURCE_DIR}/Scanner.cpp
@@ -16,10 +16,10 @@ set(cclox_lib_SRC
   ${PROJECT_SOURCE_DIR}/LoxClass.cpp
 )
 
-add_library(cclox_lib ${cclox_lib_SRC})
+add_library(lox_lib ${lox_lib_SRC})
 
-add_executable(cclox ${PROJECT_SOURCE_DIR}/main.cpp)
-target_link_libraries(cclox cclox_lib)
+add_executable(lox ${PROJECT_SOURCE_DIR}/main.cpp)
+target_link_libraries(lox lox_lib)
 
 # tests
 option(PACKAGE_TESTS "Build the tests" ON)

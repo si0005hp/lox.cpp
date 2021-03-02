@@ -2,7 +2,7 @@
 
 #include "Interpreter.h"
 
-namespace cclox
+namespace lox
 {
 
 shared_ptr<Value> LoxClass::Call(Interpreter &interpreter, const vector<shared_ptr<Value>> &arguments)
@@ -47,4 +47,4 @@ void LoxInstance::Set(const Token &name, const shared_ptr<Value> &value)
     mFields[name.Lexeme()] = value;
 }
 
-} // namespace cclox
+} // namespace lox

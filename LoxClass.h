@@ -5,7 +5,7 @@
 #include "LoxFunction.h"
 #include <unordered_map>
 
-namespace cclox
+namespace lox
 {
 
 class LoxInstance;
@@ -90,4 +90,4 @@ class LoxInstance : public Value, public enable_shared_from_this<LoxInstance>
     unordered_map<string, shared_ptr<Value>> mFields;
 };
 
-} // namespace cclox
+} // namespace lox

@@ -3,7 +3,7 @@
 #include "Environment.h"
 #include "LoxCallable.h"
 
-namespace cclox
+namespace lox
 {
 
 struct FunctionReturn : public exception
@@ -53,4 +53,4 @@ class LoxFunction : public LoxCallable
     const bool mIsInitializer;
 };
 
-} // namespace cclox
+} // namespace lox

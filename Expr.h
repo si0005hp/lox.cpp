@@ -25,7 +25,7 @@
         return visitor.Visit(*this);                                                                                   \
     }
 
-namespace cclox
+namespace lox
 {
 
 using std::shared_ptr;
@@ -227,4 +227,4 @@ class Variable : public Expr
     EXPR_ACCEPT_METHODS
 };
 
-}; // namespace cclox
+}; // namespace lox

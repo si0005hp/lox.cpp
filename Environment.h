@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace cclox
+namespace lox
 {
 
 using std::enable_shared_from_this;
@@ -38,4 +38,4 @@ class Environment : public enable_shared_from_this<Environment>
     unordered_map<string, shared_ptr<Value>> mValues;
 };
 
-} // namespace cclox
+} // namespace lox

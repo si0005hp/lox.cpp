@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-namespace cclox
+namespace lox
 {
 
 using std::ifstream;
@@ -119,4 +119,4 @@ void Lox::Report(const int &line, const string &where, const string &message)
     sHadError = true;
 }
 
-} // namespace cclox
+} // namespace lox

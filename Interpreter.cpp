@@ -3,7 +3,7 @@
 #include "LoxClass.h"
 #include "LoxFunction.h"
 
-namespace cclox
+namespace lox
 {
 
 using std::addressof;
@@ -365,4 +365,4 @@ void Interpreter::Println(const string &str) const
     mOs << str << std::endl;
 }
 
-}; // namespace cclox
+}; // namespace lox

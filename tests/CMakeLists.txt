@@ -6,7 +6,7 @@ add_subdirectory("${CMAKE_SOURCE_DIR}/googletest" "googletest")
 macro(package_add_test TESTNAME)
   add_executable(${TESTNAME} ${ARGN})
 
-  target_link_libraries(${TESTNAME} gtest gmock gtest_main cclox_lib)
+  target_link_libraries(${TESTNAME} gtest gmock gtest_main lox_lib)
   target_include_directories(${TESTNAME} PUBLIC 
     .
     ..
@@ -19,7 +19,7 @@ macro(package_add_test TESTNAME)
   set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(cclox_test
+package_add_test(lox_test
   Scanner_test.cpp
   Token_test.cpp
   Object_test.cpp

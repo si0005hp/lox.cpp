@@ -2,7 +2,7 @@
 #include "Lox.h"
 #include <iostream>
 
-namespace cclox
+namespace lox
 {
 
 void Resolver::Resolve(const vector<shared_ptr<Stmt>> &statements)
@@ -236,4 +236,4 @@ void Resolver::ResolveFunction(const Function &func, FunctionType type)
     mCurrentFunction = enclosingFunction;
 }
 
-} // namespace cclox
+} // namespace lox

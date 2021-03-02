@@ -6,7 +6,7 @@
 
 #define UNSUPPOSED_OPERATION_ERROR(op) throw(UnsupposedValueOperationError("Unsupposed call: " + string(op)));
 
-namespace cclox
+namespace lox
 {
 
 using std::exception;
@@ -189,4 +189,4 @@ class BooleanValue : public Value
     bool mValue;
 };
 
-} // namespace cclox
+} // namespace lox

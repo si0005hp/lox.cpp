@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <string>
 
-namespace cclox
+namespace lox
 {
 
 using std::string;
@@ -88,4 +88,4 @@ class Object
     double mNumber;
     ObjectBool mBool;
 };
-} // namespace cclox
+} // namespace lox

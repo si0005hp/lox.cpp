@@ -5,7 +5,7 @@
 
 #include "Object.h"
 
-namespace cclox
+namespace lox
 {
 
 using std::string;
@@ -96,8 +96,8 @@ class Token
     string mLexeme;
     Object mLiteral;
     int mLine;
-}; // namespace cclox
+}; // namespace lox
 
 std::ostream &operator<<(std::ostream &cout, const Token &token);
 
-} // namespace cclox
+} // namespace lox

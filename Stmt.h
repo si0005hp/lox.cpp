@@ -20,7 +20,7 @@
         return visitor.Visit(*this);                                                                                   \
     }
 
-namespace cclox
+namespace lox
 {
 
 using std::shared_ptr;
@@ -175,4 +175,4 @@ class While : public Stmt
     STMT_ACCEPT_METHODS
 };
 
-}; // namespace cclox
+}; // namespace lox

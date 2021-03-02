@@ -7,7 +7,7 @@
 #include <string>
 #include <type_traits>
 
-namespace cclox
+namespace lox
 {
 
 using std::any;
@@ -232,4 +232,4 @@ class AstPrinter : public Expr::Visitor<string>, public Stmt::Visitor<string>
     }
 };
 
-}; // namespace cclox
+}; // namespace lox

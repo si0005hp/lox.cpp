@@ -2,7 +2,7 @@
 
 #include "Lox.h"
 
-namespace cclox
+namespace lox
 {
 
 const vector<shared_ptr<Token>> &Scanner::ScanTokens()
@@ -219,4 +219,4 @@ void Scanner::Identifier()
     AddToken(type);
 }
 
-} // namespace cclox
+} // namespace lox
