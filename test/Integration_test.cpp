@@ -23,7 +23,7 @@ class IntegrationTestFixture : public CcloxTestFixtureBase
     string FilePath(const string &fileName)
     {
         // TODO fix
-        return "../tests/integration_test/" + fileName;
+        return "../test/integration_test/" + fileName;
     }
 
     void AssertOutput(const string &expected, const string &testFileName)

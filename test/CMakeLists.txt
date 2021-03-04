@@ -3,6 +3,8 @@ project(tests)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/googletest" "googletest")
 
+
+
 macro(package_add_test TESTNAME)
   add_executable(${TESTNAME} ${ARGN})
 
@@ -10,6 +12,7 @@ macro(package_add_test TESTNAME)
   target_include_directories(${TESTNAME} PUBLIC 
     .
     ..
+    ../src
   )
 
   gtest_discover_tests(${TESTNAME}
